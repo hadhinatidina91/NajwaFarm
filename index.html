@@ -3,779 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Najwafarm - Pro Laporan</title>
+    <title>Najwafarm Pro - Dashboard Keluarga</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <style>
-        :root{--primary:#F59E0B;--bg:#0F172A;--card:#1E293B;--text:#F1F5F9;--green:#10B981;--red:#EF4444;--blue:#3B82F6;}
-        *{box-sizing:border-box;}
-        body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);margin:0;padding:0;overflow-x:hidden;}
-        .tabs{display:flex;background:#1E293B;border-bottom:2px solid #334155;overflow-x:auto;}
-        .tab-btn{flex:1;padding:12px 5px;background:none;border:none;color:#94A3B8;cursor:pointer;font-size:11px;font-weight:bold;white-space:nowrap;min-width:60px;}
-        .tab-btn.active{color:var(--primary);border-bottom:2px solid var(--primary);}
-        .tab-content{display:none;padding:15px;}
-        .tab-content.active{display:block;}
-        .admin-trigger{position:fixed;bottom:20px;right:20px;background:var(--primary);color:#0F172A;border:none;padding:14px 20px;border-radius:50px;cursor:pointer;z-index:1000;font-size:13px;font-weight:bold;box-shadow:0 4px 15px rgba(0,0,0,0.5);}
-        .modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.98);z-index:2000;padding:15px;overflow-y:auto;}
-        .modal-content{max-width:500px;margin:10px auto;background:var(--card);padding:25px;border-radius:15px;border:1px solid var(--primary);}
-        h1{color:var(--primary);font-size:1.5rem;margin-bottom:5px;}
-        h3{color:var(--primary);margin-top:0;}
-        .month-label{font-size:12px;color:#94A3B8;margin-bottom:15px;text-transform:uppercase;}
-        .dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
-        .stat-box{background:var(--card);padding:15px;border-radius:12px;border:1px solid #334155;}
-        .stat-box h4{margin:0;font-size:0.65rem;color:#94A3B8;text-transform:uppercase;}
-        .val{font-size:1.05rem;font-weight:bold;display:block;margin-top:5px;}
-        .val-sub{font-size:0.7rem;color:#94A3B8;display:block;margin-top:2px;}
-        .progress-wrap{background:#334155;border-radius:10px;height:8px;margin-top:8px;overflow:hidden;}
-        .progress-bar{height:100%;border-radius:10px;background:var(--green);transition:width 0.5s;}
-        .filter-row{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;}
-        .filter-row select{flex:1;min-width:110px;padding:10px;border-radius:8px;border:1px solid #475569;background:#1E293B;color:white;font-size:12px;}
-        .btn-pdf{background:var(--red);border:none;padding:10px 14px;border-radius:8px;color:white;font-weight:bold;cursor:pointer;font-size:12px;white-space:nowrap;}
-        .table-container{background:var(--card);border-radius:12px;overflow-x:auto;border:1px solid #334155;}
-        table{width:100%;border-collapse:collapse;font-size:0.75rem;min-width:460px;}
-        th{background:#334155;padding:12px;color:#94A3B8;text-align:left;}
-        td{padding:11px 9px;border-bottom:1px solid #0F172A;vertical-align:top;}
-        .sub-info{font-size:0.68rem;color:#94A3B8;display:block;margin-top:3px;}
-        .ket-text{color:var(--primary);font-style:italic;font-size:0.75rem;display:block;margin-top:2px;}
-        .txt-red{color:var(--red);}.txt-green{color:var(--green);}
-        .badge{font-size:9px;padding:2px 5px;border-radius:4px;background:#334155;color:#F1F5F9;}
-        .badge-k{font-size:9px;padding:2px 6px;border-radius:4px;background:#3B82F630;color:var(--blue);}
-        label{font-size:11px;color:#94A3B8;margin-top:12px;display:block;font-weight:bold;}
-        input,select.form-select{width:100%;padding:12px;margin-top:5px;border-radius:8px;border:1px solid #475569;background:#0F172A;color:white;box-sizing:border-box;font-size:13px;}
-        .btn-save{background:var(--primary);border:none;padding:15px;width:100%;border-radius:10px;font-weight:bold;margin-top:20px;cursor:pointer;color:#0F172A;font-size:14px;}
-        .btn-cancel{background:#334155;border:none;padding:12px;width:100%;border-radius:10px;font-weight:bold;margin-top:8px;cursor:pointer;color:white;font-size:13px;}
-        .form-section{font-size:11px;margin-top:15px;border-bottom:1px solid #334155;padding-bottom:5px;font-weight:bold;}
-        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-        .btn-edit{background:none;border:none;color:var(--blue);font-size:15px;cursor:pointer;padding:4px;}
-        .btn-del{background:none;border:none;color:var(--red);font-size:15px;cursor:pointer;padding:4px;}
-        .chart-card{background:var(--card);border-radius:12px;padding:15px;border:1px solid #334155;margin-bottom:15px;}
-        .stok-display{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--primary);margin-bottom:15px;text-align:center;}
-        .stok-number{font-size:2.5rem;font-weight:bold;color:var(--primary);}
-        .stok-label{font-size:0.8rem;color:#94A3B8;}
-        .kes-badge{font-size:10px;padding:3px 8px;border-radius:20px;}
-        .kes-vaksin{background:#3B82F620;color:#3B82F6;}
-        .kes-sakit{background:#EF444420;color:#EF4444;}
-        .kes-mati{background:#64748B20;color:#94A3B8;}
-        .kes-obat{background:#10B98120;color:#10B981;}
-        .notif-banner{background:linear-gradient(135deg,#10B981,#059669);color:white;padding:12px 15px;border-radius:10px;margin-bottom:15px;font-weight:bold;font-size:13px;display:none;text-align:center;}
 
-        /* SEARCH BOX */
-        .search-card{background:var(--card);border-radius:12px;padding:15px;border:1px solid var(--primary);margin-bottom:20px;}
-        .search-card h4{margin:0 0 12px 0;font-size:12px;color:var(--primary);text-transform:uppercase;}
-        .search-row{display:flex;gap:8px;align-items:flex-end;}
-        .search-row input{flex:1;margin-top:0;}
-        .btn-cari{background:var(--primary);border:none;padding:12px 16px;border-radius:8px;color:#0F172A;font-weight:bold;cursor:pointer;white-space:nowrap;font-size:13px;}
-        .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
-        .result-item{background:#0F172A;border-radius:8px;padding:10px;border:1px solid #334155;}
-        .result-item small{font-size:10px;color:#94A3B8;text-transform:uppercase;display:block;}
-        .result-item b{font-size:14px;display:block;margin-top:3px;}
-        .result-full{grid-column:span 2;text-align:center;background:var(--primary)20;border:1px solid var(--primary);}
-        .no-result{color:#94A3B8;font-size:12px;text-align:center;padding:10px;display:none;}
+    <style>
+        :root { 
+            --primary: #F59E0B; --bg: #0F172A; --card: #1E293B; 
+            --text: #F1F5F9; --green: #10B981; --red: #EF4444; 
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
+        
+        .main-display { width: 100%; max-width: 1000px; margin: 0 auto; padding: 20px 15px; box-sizing: border-box; padding-bottom: 100px; }
+        h1 { color: var(--primary); font-size: 1.8rem; margin: 0; }
+        
+        .section-title { font-size: 12px; color: #94A3B8; margin: 25px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+
+        .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-box { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #334155; }
+        .stat-box h4 { margin: 0; font-size: 0.7rem; color: #94A3B8; text-transform: uppercase; }
+        .val { font-size: 1.2rem; font-weight: bold; display: block; margin-top: 5px; }
+        .full-width { grid-column: span 2; border: 2px solid var(--primary); }
+
+        .search-box { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--primary); }
+        .search-result { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #475569; }
+        .res-item { background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; }
+        .res-item small { color: #94A3B8; font-size: 10px; text-transform: uppercase; }
+        .res-item b { display: block; font-size: 14px; margin-top: 2px; }
+
+        .filter-box { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+        .filter-group { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .filter-group div { flex: 1; min-width: 120px; }
+        
+        .admin-trigger { 
+            position: fixed; bottom: 20px; right: 20px; 
+            background: var(--primary); color: #0F172A; 
+            border: none; padding: 15px 25px; 
+            border-radius: 50px; cursor: pointer; z-index: 1000; 
+            font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .admin-panel { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 2000; padding: 15px; overflow-y: auto; }
+        .panel-content { max-width: 500px; margin: 10px auto; background: var(--card); padding: 25px; border-radius: 15px; }
+
+        .table-container { background: var(--card); border-radius: 12px; overflow-x: auto; border: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 550px; }
+        th { background: #334155; padding: 12px; color: #94A3B8; text-align: left; }
+        td { padding: 15px 12px; border-bottom: 1px solid #0F172A; vertical-align: top; }
+        
+        .txt-red { color: var(--red); }
+        .txt-green { color: var(--green); }
+        input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #475569; background: #0F172A; color: white; box-sizing: border-box; }
+        .btn-action { background: var(--primary); border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #0F172A; }
+        .btn-edit { background: #334155; color: var(--primary); border: 1px solid var(--primary); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; margin-right: 5px; }
+        .btn-delete { background: transparent; color: var(--red); border: 1px solid var(--red); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
     </style>
 </head>
 <body>
 
-<button class="admin-trigger" onclick="aksesPanel()">+ DATA BARU</button>
+    <button id="main-btn-trigger" class="admin-trigger" onclick="aksesPanel()">🔒 LOGIN ADMIN</button>
 
-<!-- MODAL INPUT/EDIT -->
-<div id="adminPanel" class="modal">
-    <div class="modal-content">
-        <button style="float:right;color:var(--red);background:none;border:none;font-weight:bold;font-size:16px;" onclick="tutupPanel()">✕</button>
-        <h3 id="panel-title">Input Transaksi</h3>
-        <input type="hidden" id="edit-id">
-        <label>Tanggal</label><input type="date" id="tgl">
-        <label>Kandang</label>
-        <select id="kandang" class="form-select">
-            <option value="Kandang 1">Kandang 1</option>
-            <option value="Kandang 2">Kandang 2</option>
-            <option value="Kandang 3">Kandang 3</option>
-        </select>
-        <label>Keterangan</label>
-        <input type="text" id="ket" placeholder="Misal: Pakan Toko Maju / Gaji Budi">
+    <div id="adminPanel" class="admin-panel">
+        <div class="panel-content">
+            <button style="float:right; color:var(--red); background:none; border:none; font-weight:bold; cursor:pointer;" onclick="toggleAdmin()">BATAL</button>
+            <h3 id="panel-title" style="color: var(--primary); margin-top: 0;">Input Transaksi</h3>
+            
+            <input type="hidden" id="edit-id"> 
+            
+            <label>Tanggal</label>
+            <input type="date" id="tgl">
+            <label>Keterangan Tambahan</label>
+            <input type="text" id="ket" placeholder="Misal: Jual karung & beli vitamin">
 
-        <!-- PENGELUARAN -->
-        <div class="form-section" style="color:var(--red)">📉 PENGELUARAN</div>
-        <div class="form-grid">
-            <div><label>Pakan (Rp)</label><input type="text" id="pakan" placeholder="0"></div>
-            <div><label>Gaji (Rp)</label><input type="text" id="gaji" placeholder="0"></div>
-        </div>
-        <label>Pengeluaran Lain-lain (Rp)</label>
-        <input type="text" id="keluar_lain" placeholder="Contoh: Beli obat, bensin, listrik...">
-        <label>Keterangan Pengeluaran Lain</label>
-        <input type="text" id="keluar_lain_ket" placeholder="Misal: Beli obat ayam, bayar listrik">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                <div style="grid-column: span 2; color: var(--red); font-size: 11px; border-bottom: 1px solid #334155;">📉 PENGELUARAN</div>
+                <div><label>Pakan (Rp)</label><input type="text" id="pakan" placeholder="0"></div>
+                <div><label>Gaji (Rp)</label><input type="text" id="gaji" placeholder="0"></div>
+                <div style="grid-column: span 2;"><label>Biaya Lain-lain (Rp)</label><input type="text" id="biaya_lain" placeholder="0"></div>
 
-        <!-- TELUR -->
-        <div class="form-section" style="color:var(--primary)">🥚 TELUR SUPER</div>
-        <div class="form-grid">
-            <div><label>Jumlah (Kg)</label><input type="number" step="0.01" id="kg_s" placeholder="0"></div>
-            <div><label>Harga Jual /Kg</label><input type="text" id="hrg_s" placeholder="0"></div>
-        </div>
-        <div class="form-section" style="color:#FFF">🥚 TELUR PUTIH</div>
-        <div class="form-grid">
-            <div><label>Jumlah (Kg)</label><input type="number" step="0.01" id="kg_p" placeholder="0"></div>
-            <div><label>Harga Jual /Kg</label><input type="text" id="hrg_p" placeholder="0"></div>
-        </div>
+                <div style="grid-column: span 2; color: var(--primary); font-size: 11px; border-bottom: 1px solid #334155; margin-top: 10px;">🥚 PRODUKSI TELUR</div>
+                <div><label>Super (Kg)</label><input type="number" step="0.01" id="kg_s" placeholder="0"></div>
+                <div><label>Harga Super /Kg</label><input type="text" id="hrg_s" placeholder="0"></div>
+                <div><label>Putih (Kg)</label><input type="number" step="0.01" id="kg_p" placeholder="0"></div>
+                <div><label>Harga Putih /Kg</label><input type="text" id="hrg_p" placeholder="0"></div>
 
-        <!-- PEMASUKAN LAIN -->
-        <div class="form-section" style="color:var(--green)">💰 PEMASUKAN LAIN</div>
-        <label>Nominal Pemasukan Lain (Rp)</label>
-        <input type="text" id="masuk_lain" placeholder="Contoh: Jual karung, ayam afkir...">
-        <label>Keterangan Pemasukan Lain</label>
-        <input type="text" id="masuk_lain_ket" placeholder="Misal: Jual ayam afkir, jual pupuk">
+                <div style="grid-column: span 2; color: var(--green); font-size: 11px; border-bottom: 1px solid #334155; margin-top: 10px;">💰 PEMASUKAN LAIN</div>
+                <div style="grid-column: span 2;"><label>Nominal Pemasukan Lain (Rp)</label><input type="text" id="masuk_lain" placeholder="0"></div>
+            </div>
 
-        <button class="btn-save" onclick="simpanData()">💾 SIMPAN KE CLOUD</button>
-        <button class="btn-cancel" onclick="tutupPanel()">BATAL</button>
-    </div>
-</div>
-
-<!-- MODAL TARGET -->
-<div id="targetPanel" class="modal">
-    <div class="modal-content">
-        <button style="float:right;color:var(--red);background:none;border:none;font-weight:bold;" onclick="document.getElementById('targetPanel').style.display='none'">✕</button>
-        <h3>🎯 Set Target Laba Bulanan</h3>
-        <label>Target Laba (Rp)</label>
-        <input type="text" id="target-input" placeholder="Contoh: 5.000.000">
-        <button class="btn-save" onclick="simpanTarget()">SIMPAN TARGET</button>
-    </div>
-</div>
-
-<!-- MODAL STOK -->
-<div id="stokPanel" class="modal">
-    <div class="modal-content">
-        <button style="float:right;color:var(--red);background:none;border:none;font-weight:bold;" onclick="document.getElementById('stokPanel').style.display='none'">✕</button>
-        <h3>🌾 Update Stok Pakan</h3>
-        <label>Jenis Transaksi</label>
-        <select id="stok-jenis" class="form-select">
-            <option value="masuk">+ Masuk (Beli Pakan)</option>
-            <option value="keluar">- Keluar (Pakan Terpakai)</option>
-            <option value="set">Set Stok Manual</option>
-        </select>
-        <label>Jumlah (Kg)</label><input type="number" step="0.1" id="stok-jumlah" placeholder="0">
-        <label>Keterangan</label><input type="text" id="stok-ket" placeholder="Misal: Beli dari Toko Maju">
-        <button class="btn-save" onclick="simpanStok()">SIMPAN</button>
-        <button class="btn-cancel" onclick="document.getElementById('stokPanel').style.display='none'">BATAL</button>
-    </div>
-</div>
-
-<!-- MODAL KESEHATAN -->
-<div id="kesPanel" class="modal">
-    <div class="modal-content">
-        <button style="float:right;color:var(--red);background:none;border:none;font-weight:bold;" onclick="document.getElementById('kesPanel').style.display='none'">✕</button>
-        <h3>🐔 Catatan Kesehatan Ayam</h3>
-        <label>Tanggal</label><input type="date" id="kes-tgl">
-        <label>Jenis</label>
-        <select id="kes-jenis" class="form-select">
-            <option value="vaksin">💉 Vaksin</option>
-            <option value="obat">💊 Pemberian Obat</option>
-            <option value="sakit">🤒 Ayam Sakit</option>
-            <option value="mati">💀 Ayam Mati</option>
-        </select>
-        <label>Kandang</label>
-        <select id="kes-kandang" class="form-select">
-            <option value="Kandang 1">Kandang 1</option>
-            <option value="Kandang 2">Kandang 2</option>
-            <option value="Kandang 3">Kandang 3</option>
-        </select>
-        <label>Jumlah Ayam (jika ada)</label><input type="number" id="kes-jumlah" placeholder="0">
-        <label>Keterangan</label><input type="text" id="kes-ket" placeholder="Misal: Vaksin ND, Obat cacing">
-        <button class="btn-save" onclick="simpanKesehatan()">SIMPAN</button>
-        <button class="btn-cancel" onclick="document.getElementById('kesPanel').style.display='none'">BATAL</button>
-    </div>
-</div>
-
-<!-- HEADER -->
-<div style="padding:20px 15px 5px">
-    <h1>Najwafarm 🐔</h1>
-    <div id="currentMonth" class="month-label">Memuat...</div>
-</div>
-
-<!-- TABS -->
-<div class="tabs">
-    <button class="tab-btn active" onclick="gotoTab('laporan',this)">📊 Laporan</button>
-    <button class="tab-btn" onclick="gotoTab('cari',this)">🔍 Cari</button>
-    <button class="tab-btn" onclick="gotoTab('grafik',this)">📈 Grafik</button>
-    <button class="tab-btn" onclick="gotoTab('stok',this)">🌾 Stok</button>
-    <button class="tab-btn" onclick="gotoTab('kesehatan',this)">🐔 Sehat</button>
-</div>
-
-<!-- TAB LAPORAN -->
-<div id="tab-laporan" class="tab-content active">
-    <div id="notif-banner" class="notif-banner">🎉 Selamat! Target Laba Bulan Ini Tercapai!</div>
-    <div class="filter-row">
-        <select id="filter-bulan" onchange="loadData()"></select>
-        <select id="filter-kandang" onchange="loadData()">
-            <option value="semua">Semua Kandang</option>
-            <option value="Kandang 1">Kandang 1</option>
-            <option value="Kandang 2">Kandang 2</option>
-            <option value="Kandang 3">Kandang 3</option>
-        </select>
-        <button class="btn-pdf" onclick="downloadPDF()">📄 PDF</button>
-    </div>
-    <div class="dashboard">
-        <div class="stat-box"><h4>Total Omset</h4><span id="pub-masuk" class="val txt-green">Rp 0</span></div>
-        <div class="stat-box"><h4>Total Biaya</h4><span id="pub-keluar" class="val txt-red">Rp 0</span></div>
-        <div class="stat-box" style="border:1px solid var(--primary)">
-            <h4>🥚 Telur Super</h4>
-            <span id="pub-kg-super" class="val txt-green">0 Kg</span>
-            <span id="pub-butir-super" class="val-sub">≈ 0 butir</span>
-        </div>
-        <div class="stat-box" style="border:1px solid #475569">
-            <h4>🥚 Telur Putih</h4>
-            <span id="pub-kg-putih" class="val">0 Kg</span>
-            <span id="pub-butir-putih" class="val-sub">≈ 0 butir</span>
-        </div>
-        <div class="stat-box" style="border:1px solid var(--green)">
-            <h4>💰 Pemasukan Lain</h4>
-            <span id="pub-masuk-lain" class="val txt-green">Rp 0</span>
-        </div>
-        <div class="stat-box" style="border:1px solid var(--red)">
-            <h4>💸 Pengeluaran Lain</h4>
-            <span id="pub-keluar-lain" class="val txt-red">Rp 0</span>
-        </div>
-        <div class="stat-box" style="grid-column:span 2;border:1px solid var(--primary)">
-            <h4>💰 Laba Bersih <span id="target-label" style="float:right;cursor:pointer;color:var(--blue);font-weight:normal" onclick="bukaTarget()">🎯 Set Target</span></h4>
-            <span id="pub-laba" class="val">Rp 0</span>
-            <div class="progress-wrap" id="progress-wrap" style="display:none"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
-            <span id="progress-label" class="val-sub"></span>
+            <button id="btn-save" class="btn-action" style="width: 100%; margin-top: 25px; padding: 15px;" onclick="simpanData()">SIMPAN DATA</button>
         </div>
     </div>
-    <div class="table-container">
-        <table>
-            <thead><tr><th>Tgl / Ket</th><th>Pengeluaran</th><th>Pemasukan & Laba</th><th>Opsi</th></tr></thead>
-            <tbody id="pub-tabel"></tbody>
-        </table>
-    </div>
-</div>
 
-<!-- TAB CARI -->
-<div id="tab-cari" class="tab-content">
+    <div class="main-display">
+        <h1>Najwafarm 🐔</h1>
+        <p style="color: #94A3B8; margin-bottom: 20px; font-size: 14px;">Laporan Keuangan & Produksi</p>
 
-    <!-- Cari Penjualan Telur -->
-    <div class="search-card">
-        <h4>🥚 Cari Penjualan Telur Per Tanggal</h4>
-        <div class="search-row">
-            <input type="date" id="cari-tgl-telur">
-            <button class="btn-cari" onclick="cariTelur()">CEK</button>
+        <div class="section-title">Ringkasan Saldo Global</div>
+        <div class="dashboard-grid">
+            <div class="stat-box full-width">
+                <h4>Saldo Keuntungan Bersih</h4>
+                <span id="saldo-global" class="val">Rp 0</span>
+            </div>
+            <div class="stat-box">
+                <h4>Total Pengeluaran</h4>
+                <span id="total-keluar-global" class="val txt-red">Rp 0</span>
+            </div>
+            <div class="stat-box">
+                <h4>Total Pemasukan</h4>
+                <span id="total-masuk-global" class="val txt-green">Rp 0</span>
+            </div>
         </div>
-        <div id="result-telur" style="display:none">
-            <div class="result-grid">
-                <div class="result-item">
-                    <small>🥚 Telur Super</small>
-                    <b id="res-kg-super" class="txt-green">0 Kg</b>
-                    <span style="font-size:11px;color:#94A3B8" id="res-butir-super">≈ 0 butir</span>
-                </div>
-                <div class="result-item">
-                    <small>🥚 Telur Putih</small>
-                    <b id="res-kg-putih">0 Kg</b>
-                    <span style="font-size:11px;color:#94A3B8" id="res-butir-putih">≈ 0 butir</span>
-                </div>
-                <div class="result-item result-full">
-                    <small>Total Produksi Hari Ini</small>
-                    <b id="res-total-kg" style="color:var(--primary)">0 Kg</b>
-                </div>
-                <div class="result-item">
-                    <small>💰 Omset Telur</small>
-                    <b id="res-omset-telur" class="txt-green">Rp 0</b>
-                </div>
-                <div class="result-item">
-                    <small>📉 Total Biaya</small>
-                    <b id="res-biaya" class="txt-red">Rp 0</b>
-                </div>
-                <div class="result-item result-full">
-                    <small>Laba Hari Ini</small>
-                    <b id="res-laba-hari" style="color:var(--primary)">Rp 0</b>
+
+        <div class="section-title">Cek Produksi & Harga Telur</div>
+        <div class="search-box">
+            <label style="font-size: 11px; color: #94A3B8;">Pilih Tanggal Untuk Melihat Detail</label>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <input type="date" id="search-date">
+                <button class="btn-action" onclick="cariData()">CEK DATA</button>
+            </div>
+            
+            <div id="search-result-area" style="display:none;">
+                <div class="search-result">
+                    <div class="res-item">
+                        <small>Harga Super</small>
+                        <b id="res-hrg-s" class="txt-green">Rp 0</b>
+                        <small style="margin-top:5px; display:block">Berat: <span id="res-kg-s">0</span> Kg</small>
+                    </div>
+                    <div class="res-item">
+                        <small>Harga Putih</small>
+                        <b id="res-hrg-p" class="txt-green">Rp 0</b>
+                        <small style="margin-top:5px; display:block">Berat: <span id="res-kg-p">0</span> Kg</small>
+                    </div>
+                    <div class="res-item" style="grid-column: span 2; text-align: center; background: var(--primary); color: #0F172A;">
+                        <small style="color: #0F172A; font-weight: bold;">Total Produksi Hari Ini</small>
+                        <b id="res-total-kg" style="font-size: 18px;">0 Kg</b>
+                    </div>
                 </div>
             </div>
         </div>
-        <div id="no-result-telur" class="no-result">Tidak ada data untuk tanggal ini</div>
-    </div>
 
-    <!-- Cek Harga Telur -->
-    <div class="search-card">
-        <h4>💲 Cek Harga Telur Per Tanggal</h4>
-        <div class="search-row">
-            <input type="date" id="cari-tgl-harga">
-            <button class="btn-cari" onclick="cariHarga()">CEK</button>
-        </div>
-        <div id="result-harga" style="display:none">
-            <div class="result-grid">
-                <div class="result-item">
-                    <small>Harga Telur Super /Kg</small>
-                    <b id="res-hrg-super" class="txt-green">Rp 0</b>
-                </div>
-                <div class="result-item">
-                    <small>Harga Telur Putih /Kg</small>
-                    <b id="res-hrg-putih">Rp 0</b>
-                </div>
+        <div class="section-title">Tabel Laporan Berkala</div>
+        <div class="filter-box">
+            <div class="filter-group">
+                <div><label>Dari</label><input type="date" id="f-mulai"></div>
+                <div><label>Sampai</label><input type="date" id="f-selesai"></div>
+                <button class="btn-action" onclick="muatData()">FILTER</button>
             </div>
         </div>
-        <div id="no-result-harga" class="no-result">Tidak ada data harga untuk tanggal ini</div>
-    </div>
 
-    <!-- Cari Pemasukan/Pengeluaran Lain -->
-    <div class="search-card">
-        <h4>💸 Cari Transaksi Lain Per Tanggal</h4>
-        <div class="search-row">
-            <input type="date" id="cari-tgl-lain">
-            <button class="btn-cari" onclick="cariLain()">CEK</button>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tgl / Ket</th>
+                        <th>Biaya Total</th>
+                        <th>Omset & Laba</th>
+                        <th>Opsi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabel-body"></tbody>
+            </table>
         </div>
-        <div id="result-lain" style="display:none">
-            <div class="result-grid">
-                <div class="result-item" style="border:1px solid var(--green)20">
-                    <small>💰 Pemasukan Lain</small>
-                    <b id="res-masuk-lain" class="txt-green">Rp 0</b>
-                    <span style="font-size:11px;color:#94A3B8;display:block" id="res-masuk-lain-ket">-</span>
-                </div>
-                <div class="result-item" style="border:1px solid var(--red)20">
-                    <small>💸 Pengeluaran Lain</small>
-                    <b id="res-keluar-lain" class="txt-red">Rp 0</b>
-                    <span style="font-size:11px;color:#94A3B8;display:block" id="res-keluar-lain-ket">-</span>
-                </div>
-            </div>
-        </div>
-        <div id="no-result-lain" class="no-result">Tidak ada transaksi lain untuk tanggal ini</div>
     </div>
-</div>
-
-<!-- TAB GRAFIK -->
-<div id="tab-grafik" class="tab-content">
-    <div class="chart-card"><h4 style="color:#94A3B8;font-size:12px;margin:0 0 10px 0">📊 OMSET VS BIAYA (30 HARI)</h4><canvas id="chartOmset"></canvas></div>
-    <div class="chart-card"><h4 style="color:#94A3B8;font-size:12px;margin:0 0 10px 0">📈 LABA HARIAN</h4><canvas id="chartLaba"></canvas></div>
-    <div class="chart-card"><h4 style="color:#94A3B8;font-size:12px;margin:0 0 10px 0">🥚 TOTAL TELUR (Kg)</h4><canvas id="chartTelur"></canvas></div>
-</div>
-
-<!-- TAB STOK -->
-<div id="tab-stok" class="tab-content">
-    <div class="stok-display">
-        <div class="stok-label">STOK PAKAN SAAT INI</div>
-        <div id="stok-angka" class="stok-number">0</div>
-        <div class="stok-label">Kilogram</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px">
-        <button class="btn-save" style="margin:0;background:var(--green)" onclick="bukaStok('masuk')">+ Beli Pakan</button>
-        <button class="btn-save" style="margin:0;background:var(--red)" onclick="bukaStok('keluar')">- Terpakai</button>
-    </div>
-    <div class="table-container">
-        <table>
-            <thead><tr><th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th></tr></thead>
-            <tbody id="stok-tabel"></tbody>
-        </table>
-    </div>
-</div>
-
-<!-- TAB KESEHATAN -->
-<div id="tab-kesehatan" class="tab-content">
-    <button class="btn-save" style="margin-bottom:15px" onclick="document.getElementById('kesPanel').style.display='block'">+ Tambah Catatan Kesehatan</button>
-    <div class="table-container">
-        <table>
-            <thead><tr><th>Tanggal</th><th>Jenis</th><th>Kandang</th><th>Keterangan</th><th>Opsi</th></tr></thead>
-            <tbody id="kes-tabel"></tbody>
-        </table>
-    </div>
-</div>
 
 <script>
-const firebaseConfig={
-    apiKey:"AIzaSyDbwSAS7uZ-TVZlSn97WP9sNU3JXYQeMvA",
-    authDomain:"najwafarm-dd1be.firebaseapp.com",
-    databaseURL:"https://najwafarm-dd1be-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId:"najwafarm-dd1be",
-    storageBucket:"najwafarm-dd1be.appspot.com",
-    messagingSenderId:"1033743274448",
-    appId:"1:1033743274448:web:6ad64eff21baaadc5369d5"
-};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
-const {ServerValue}=firebase.database;
-
-let is_admin=false,allDataCache={},targetLaba=0;
-let chartO=null,chartL=null,chartT=null;
-const BUTIR=16;
-
-function gotoTab(id,btn){
-    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    document.getElementById('tab-'+id).classList.add('active');
-    btn.classList.add('active');
-    if(id==='grafik') renderCharts();
-}
-
-function cekAdmin(){
-    if(is_admin) return true;
-    const p=prompt("Masukkan PIN Admin:");
-    if(p==="9999"){is_admin=true;return true;}
-    alert("PIN Salah!"); return false;
-}
-
-function aksesPanel(){if(!cekAdmin())return; bukaInputBaru();}
-
-function bukaInputBaru(){
-    document.getElementById('panel-title').textContent='Input Transaksi Baru';
-    document.getElementById('edit-id').value='';
-    ['ket','pakan','gaji','hrg_s','hrg_p','keluar_lain','keluar_lain_ket','masuk_lain','masuk_lain_ket'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('kg_s').value='';
-    document.getElementById('kg_p').value='';
-    document.getElementById('tgl').valueAsDate=new Date();
-    document.getElementById('adminPanel').style.display='block';
-}
-
-function tutupPanel(){document.getElementById('adminPanel').style.display='none';}
-
-function bukaEdit(id,item){
-    if(!cekAdmin())return;
-    document.getElementById('panel-title').textContent='✏️ Edit Transaksi';
-    document.getElementById('edit-id').value=id;
-    document.getElementById('tgl').value=item.tgl;
-    document.getElementById('ket').value=item.ket||'';
-    document.getElementById('kandang').value=item.kandang||'Kandang 1';
-    document.getElementById('pakan').value=item.pakan?fRK(String(item.pakan)):'';
-    document.getElementById('gaji').value=item.gaji?fRK(String(item.gaji)):'';
-    document.getElementById('kg_s').value=item.kg_s||'';
-    document.getElementById('hrg_s').value=item.hrg_s?fRK(String(item.hrg_s)):'';
-    document.getElementById('kg_p').value=item.kg_p||'';
-    document.getElementById('hrg_p').value=item.hrg_p?fRK(String(item.hrg_p)):'';
-    document.getElementById('keluar_lain').value=item.keluar_lain?fRK(String(item.keluar_lain)):'';
-    document.getElementById('keluar_lain_ket').value=item.keluar_lain_ket||'';
-    document.getElementById('masuk_lain').value=item.masuk_lain?fRK(String(item.masuk_lain)):'';
-    document.getElementById('masuk_lain_ket').value=item.masuk_lain_ket||'';
-    document.getElementById('adminPanel').style.display='block';
-}
-
-function bukaTarget(){
-    if(!cekAdmin())return;
-    document.getElementById('target-input').value=targetLaba>0?fRK(String(targetLaba)):'';
-    document.getElementById('targetPanel').style.display='block';
-}
-
-function bukaStok(jenis){
-    document.getElementById('stok-jenis').value=jenis;
-    document.getElementById('stokPanel').style.display='block';
-}
-
-function formatRp(n){return "Rp "+Number(n).toLocaleString('id-ID');}
-function fRK(a){
-    let s=String(a).replace(/[^,\d]/g,''),sp=s.split(','),sisa=sp[0].length%3,rp=sp[0].substr(0,sisa);
-    let rb=sp[0].substr(sisa).match(/\d{3}/gi);
-    if(rb){rp+=(sisa?'.':'')+rb.join('.');}
-    return sp[1]!==undefined?rp+','+sp[1]:rp;
-}
-function bersih(s){return parseFloat(String(s).replace(/\./g,'').replace(',','.'))||0;}
-
-['pakan','gaji','hrg_s','hrg_p','keluar_lain','masuk_lain','target-input'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.addEventListener('keyup',function(){this.value=fRK(this.value);});
-});
-
-function simpanData(){
-    const tgl=document.getElementById('tgl').value;
-    if(!tgl) return alert("Pilih tanggal!");
-    const editId=document.getElementById('edit-id').value;
-    const payload={
-        tgl,
-        ket:document.getElementById('ket').value||"Tanpa Keterangan",
-        kandang:document.getElementById('kandang').value,
-        pakan:bersih(document.getElementById('pakan').value),
-        gaji:bersih(document.getElementById('gaji').value),
-        kg_s:parseFloat(document.getElementById('kg_s').value)||0,
-        hrg_s:bersih(document.getElementById('hrg_s').value),
-        kg_p:parseFloat(document.getElementById('kg_p').value)||0,
-        hrg_p:bersih(document.getElementById('hrg_p').value),
-        keluar_lain:bersih(document.getElementById('keluar_lain').value),
-        keluar_lain_ket:document.getElementById('keluar_lain_ket').value,
-        masuk_lain:bersih(document.getElementById('masuk_lain').value),
-        masuk_lain_ket:document.getElementById('masuk_lain_ket').value,
+    const firebaseConfig = {
+        apiKey: "AIzaSyDbwSAS7uZ-TVZlSn97WP9sNU3JXYQeMvA",
+        authDomain: "najwafarm-dd1be.firebaseapp.com",
+        databaseURL: "https://najwafarm-dd1be-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "najwafarm-dd1be",
+        storageBucket: "najwafarm-dd1be.appspot.com",
+        messagingSenderId: "1033743274448",
+        appId: "1:1033743274448:web:6ad64eff21baaadc5369d5"
     };
-    const ref=editId?db.ref('ternak_laporan/'+editId).update(payload):db.ref('ternak_laporan').push({...payload,ts:ServerValue.TIMESTAMP});
-    ref.then(()=>{alert(editId?"Data berhasil diupdate!":"Berhasil disimpan!");tutupPanel();});
-}
 
-function hapusData(id){
-    if(!is_admin){alert("Login admin dulu!");return;}
-    if(confirm("Hapus transaksi ini?")) db.ref('ternak_laporan/'+id).remove();
-}
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    let is_admin = false;
+    let globalDataSnapshot = null;
 
-// ===== FITUR PENCARIAN =====
-function cariTelur(){
-    const tgl=document.getElementById('cari-tgl-telur').value;
-    if(!tgl) return alert("Pilih tanggal!");
-    let kgS=0,kgP=0,omset=0,biaya=0,found=false;
-    Object.values(allDataCache).forEach(item=>{
-        if(item.tgl===tgl){
-            kgS+=(item.kg_s||0); kgP+=(item.kg_p||0);
-            omset+=((item.kg_s||0)*(item.hrg_s||0))+((item.kg_p||0)*(item.hrg_p||0))+(item.masuk_lain||0);
-            biaya+=(item.pakan||0)+(item.gaji||0)+(item.keluar_lain||0);
-            found=true;
-        }
+    // Inisialisasi Tanggal
+    const now = new Date();
+    document.getElementById('f-mulai').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    document.getElementById('f-selesai').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    document.getElementById('tgl').valueAsDate = now;
+    document.getElementById('search-date').valueAsDate = now;
+
+    function formatRp(n) { return "Rp " + Math.abs(Number(n)).toLocaleString('id-ID'); }
+    function bersihAngka(str) { 
+        if(typeof str === 'number') return str;
+        return parseFloat(str.replace(/\./g, '')) || 0; 
+    }
+
+    // Input Auto Formatting Rupiah
+    const inputUang = ['pakan', 'gaji', 'biaya_lain', 'hrg_s', 'hrg_p', 'masuk_lain'];
+    inputUang.forEach(id => {
+        document.getElementById(id).addEventListener('keyup', function() {
+            let val = this.value.replace(/[^0-9]/g, '');
+            this.value = val ? Number(val).toLocaleString('id-ID') : '';
+        });
     });
-    document.getElementById('result-telur').style.display=found?'block':'none';
-    document.getElementById('no-result-telur').style.display=found?'none':'block';
-    if(found){
-        document.getElementById('res-kg-super').textContent=kgS.toFixed(2)+' Kg';
-        document.getElementById('res-butir-super').textContent='≈ '+Math.round(kgS*BUTIR)+' butir';
-        document.getElementById('res-kg-putih').textContent=kgP.toFixed(2)+' Kg';
-        document.getElementById('res-butir-putih').textContent='≈ '+Math.round(kgP*BUTIR)+' butir';
-        document.getElementById('res-total-kg').textContent=(kgS+kgP).toFixed(2)+' Kg';
-        document.getElementById('res-omset-telur').textContent=formatRp(omset);
-        document.getElementById('res-biaya').textContent=formatRp(biaya);
-        const laba=omset-biaya;
-        const el=document.getElementById('res-laba-hari');
-        el.textContent=formatRp(laba);
-        el.style.color=laba>=0?'var(--green)':'var(--red)';
-    }
-}
 
-function cariHarga(){
-    const tgl=document.getElementById('cari-tgl-harga').value;
-    if(!tgl) return alert("Pilih tanggal!");
-    let hrgS=0,hrgP=0,found=false;
-    Object.values(allDataCache).forEach(item=>{
-        if(item.tgl===tgl){
-            if(item.hrg_s>0) hrgS=item.hrg_s;
-            if(item.hrg_p>0) hrgP=item.hrg_p;
-            found=true;
+    function aksesPanel() {
+        if (is_admin) { 
+            resetForm(); 
+            toggleAdmin(); 
+        } else {
+            if (prompt("Masukkan PIN Admin:") === "9999") { 
+                is_admin = true; 
+                document.getElementById('main-btn-trigger').textContent = "+ DATA BARU";
+                muatData(); 
+                toggleAdmin(); 
+            } else {
+                alert("PIN Salah!");
+            }
         }
-    });
-    document.getElementById('result-harga').style.display=found?'block':'none';
-    document.getElementById('no-result-harga').style.display=found?'none':'block';
-    if(found){
-        document.getElementById('res-hrg-super').textContent=formatRp(hrgS)+'/Kg';
-        document.getElementById('res-hrg-putih').textContent=formatRp(hrgP)+'/Kg';
     }
-}
 
-function cariLain(){
-    const tgl=document.getElementById('cari-tgl-lain').value;
-    if(!tgl) return alert("Pilih tanggal!");
-    let masuk=0,keluar=0,masukKet=[],keluarKet=[],found=false;
-    Object.values(allDataCache).forEach(item=>{
-        if(item.tgl===tgl){
-            masuk+=(item.masuk_lain||0);
-            keluar+=(item.keluar_lain||0);
-            if(item.masuk_lain_ket) masukKet.push(item.masuk_lain_ket);
-            if(item.keluar_lain_ket) keluarKet.push(item.keluar_lain_ket);
-            if((item.masuk_lain||0)>0||(item.keluar_lain||0)>0) found=true;
+    function toggleAdmin() {
+        const p = document.getElementById('adminPanel');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function resetForm() {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('panel-title').textContent = "Input Transaksi Baru";
+        document.getElementById('btn-save').textContent = "SIMPAN DATA";
+        document.getElementById('ket').value = "";
+        inputUang.forEach(id => document.getElementById(id).value = "");
+        document.getElementById('kg_s').value = "";
+        document.getElementById('kg_p').value = "";
+        document.getElementById('tgl').valueAsDate = new Date();
+    }
+
+    function prepareEdit(id) {
+        const data = globalDataSnapshot[id];
+        document.getElementById('edit-id').value = id;
+        document.getElementById('panel-title').textContent = "Edit Data Transaksi";
+        document.getElementById('btn-save').textContent = "UPDATE DATA";
+        
+        document.getElementById('tgl').value = data.tgl;
+        document.getElementById('ket').value = data.ket || "";
+        document.getElementById('pakan').value = (data.pakan || 0).toLocaleString('id-ID');
+        document.getElementById('gaji').value = (data.gaji || 0).toLocaleString('id-ID');
+        document.getElementById('biaya_lain').value = (data.biaya_lain || 0).toLocaleString('id-ID');
+        document.getElementById('kg_s').value = data.kg_s || 0;
+        document.getElementById('hrg_s').value = (data.hrg_s || 0).toLocaleString('id-ID');
+        document.getElementById('kg_p').value = data.kg_p || 0;
+        document.getElementById('hrg_p').value = (data.hrg_p || 0).toLocaleString('id-ID');
+        document.getElementById('masuk_lain').value = (data.masuk_lain || 0).toLocaleString('id-ID');
+        
+        toggleAdmin();
+    }
+
+    function hapusData(id) {
+        if (confirm("Hapus data ini secara permanen?")) {
+            database.ref('ternak_laporan/' + id).remove()
+                .then(() => alert("Data berhasil dihapus!"))
+                .catch(e => alert("Gagal: " + e.message));
         }
-    });
-    document.getElementById('result-lain').style.display=found?'block':'none';
-    document.getElementById('no-result-lain').style.display=found?'none':'block';
-    if(found){
-        document.getElementById('res-masuk-lain').textContent=formatRp(masuk);
-        document.getElementById('res-masuk-lain-ket').textContent=masukKet.join(', ')||'-';
-        document.getElementById('res-keluar-lain').textContent=formatRp(keluar);
-        document.getElementById('res-keluar-lain-ket').textContent=keluarKet.join(', ')||'-';
     }
-}
 
-// ===== FILTER & LOAD =====
-function isiFilterBulan(){
-    const sel=document.getElementById('filter-bulan');
-    const skrg=new Date();
-    sel.innerHTML='';
-    for(let i=0;i<12;i++){
-        const d=new Date(skrg.getFullYear(),skrg.getMonth()-i,1);
-        const val=`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
-        const label=d.toLocaleString('id-ID',{month:'long',year:'numeric'});
-        sel.innerHTML+=`<option value="${val}">${label}</option>`;
-    }
-}
+    function simpanData() {
+        const tgl = document.getElementById('tgl').value;
+        const id = document.getElementById('edit-id').value;
+        if(!tgl) return alert("Pilih tanggal!");
 
-function loadData(){
-    const filterBln=document.getElementById('filter-bulan').value;
-    const filterKdg=document.getElementById('filter-kandang').value;
-    document.getElementById('currentMonth').textContent=new Date(filterBln+'-01').toLocaleString('id-ID',{month:'long',year:'numeric'});
-    const tbody=document.getElementById('pub-tabel');
-    tbody.innerHTML="";
-    let tM=0,tK=0,tKgS=0,tKgP=0,tMasukLain=0,tKeluarLain=0;
+        const payload = {
+            tgl: tgl,
+            ket: document.getElementById('ket').value || "Tanpa Keterangan",
+            pakan: bersihAngka(document.getElementById('pakan').value),
+            gaji: bersihAngka(document.getElementById('gaji').value),
+            biaya_lain: bersihAngka(document.getElementById('biaya_lain').value),
+            kg_s: parseFloat(document.getElementById('kg_s').value) || 0,
+            hrg_s: bersihAngka(document.getElementById('hrg_s').value),
+            kg_p: parseFloat(document.getElementById('kg_p').value) || 0,
+            hrg_p: bersihAngka(document.getElementById('hrg_p').value),
+            masuk_lain: bersihAngka(document.getElementById('masuk_lain').value)
+        };
 
-    if(allDataCache&&Object.keys(allDataCache).length>0){
-        const sorted=Object.entries(allDataCache).sort((a,b)=>b[1].tgl.localeCompare(a[1].tgl));
-        sorted.forEach(([id,item])=>{
-            if(!item.tgl||!item.tgl.startsWith(filterBln))return;
-            if(filterKdg!=='semua'&&item.kandang&&item.kandang!==filterKdg)return;
-            const biaya=(item.pakan||0)+(item.gaji||0)+(item.keluar_lain||0);
-            const omset=((item.kg_s||0)*(item.hrg_s||0))+((item.kg_p||0)*(item.hrg_p||0))+(item.masuk_lain||0);
-            const laba=omset-biaya;
-            tM+=omset; tK+=biaya; tKgS+=(item.kg_s||0); tKgP+=(item.kg_p||0);
-            tMasukLain+=(item.masuk_lain||0); tKeluarLain+=(item.keluar_lain||0);
-            const kBadge=item.kandang?`<span class="badge-k">${item.kandang}</span> `:'';
-            const editBtn=is_admin?`<button class="btn-edit" onclick='bukaEdit("${id}",${JSON.stringify(item)})'>✏️</button>`:'';
-            const delBtn=is_admin?`<button class="btn-del" onclick="hapusData('${id}')">✖</button>`:'🔒';
-            tbody.innerHTML+=`<tr>
-                <td><b>${item.tgl.split('-').reverse().join('/')}</b>${kBadge}<span class="ket-text">${item.ket}</span></td>
-                <td>
-                    <span class="txt-red" style="font-weight:bold">${formatRp(biaya)}</span>
-                    ${item.pakan>0?`<span class="sub-info">🔸 Pakan: ${formatRp(item.pakan)}</span>`:''}
-                    ${item.gaji>0?`<span class="sub-info">🔸 Gaji: ${formatRp(item.gaji)}</span>`:''}
-                    ${item.keluar_lain>0?`<span class="sub-info">🔸 Lain: ${formatRp(item.keluar_lain)}${item.keluar_lain_ket?' ('+item.keluar_lain_ket+')':''}</span>`:''}
-                </td>
-                <td>
-                    <span class="txt-green" style="font-weight:bold">${formatRp(omset)}</span>
-                    ${item.kg_s>0?`<span class="sub-info"><span class="badge">Super</span> ${item.kg_s}kg ≈ ${Math.round(item.kg_s*BUTIR)} butir</span>`:''}
-                    ${item.kg_p>0?`<span class="sub-info"><span class="badge">Putih</span> ${item.kg_p}kg ≈ ${Math.round(item.kg_p*BUTIR)} butir</span>`:''}
-                    ${item.masuk_lain>0?`<span class="sub-info">💰 Lain: ${formatRp(item.masuk_lain)}${item.masuk_lain_ket?' ('+item.masuk_lain_ket+')':''}</span>`:''}
-                    <div style="margin-top:5px;border-top:1px solid #334155;padding-top:3px;color:${laba>=0?'var(--green)':'var(--red)'};font-weight:bold">Laba: ${formatRp(laba)}</div>
-                </td>
-                <td style="text-align:center;white-space:nowrap">${editBtn}${delBtn}</td>
-            </tr>`;
+        const ref = id ? database.ref('ternak_laporan/' + id) : database.ref('ternak_laporan').push();
+        ref.set(payload).then(() => {
+            alert(id ? "Data Diperbarui!" : "Data Tersimpan!");
+            toggleAdmin(); 
+            resetForm();
         });
     }
 
-    document.getElementById('pub-masuk').textContent=formatRp(tM);
-    document.getElementById('pub-keluar').textContent=formatRp(tK);
-    document.getElementById('pub-kg-super').textContent=tKgS.toFixed(1)+' Kg';
-    document.getElementById('pub-butir-super').textContent='≈ '+Math.round(tKgS*BUTIR).toLocaleString('id-ID')+' butir';
-    document.getElementById('pub-kg-putih').textContent=tKgP.toFixed(1)+' Kg';
-    document.getElementById('pub-butir-putih').textContent='≈ '+Math.round(tKgP*BUTIR).toLocaleString('id-ID')+' butir';
-    document.getElementById('pub-masuk-lain').textContent=formatRp(tMasukLain);
-    document.getElementById('pub-keluar-lain').textContent=formatRp(tKeluarLain);
-    const laba=tM-tK;
-    document.getElementById('pub-laba').textContent=formatRp(laba);
-    document.getElementById('pub-laba').className='val '+(laba>=0?'txt-green':'txt-red');
-    if(targetLaba>0){
-        const pct=Math.min((laba/targetLaba)*100,100);
-        document.getElementById('progress-wrap').style.display='block';
-        document.getElementById('progress-bar').style.width=Math.max(0,pct)+'%';
-        document.getElementById('progress-bar').style.background=pct>=100?'var(--green)':'var(--primary)';
-        document.getElementById('progress-label').textContent=`${pct.toFixed(0)}% dari target ${formatRp(targetLaba)}`;
-        document.getElementById('notif-banner').style.display=pct>=100?'block':'none';
-    }
-}
-
-function simpanTarget(){
-    const val=bersih(document.getElementById('target-input').value);
-    db.ref('settings/target_laba').set(val).then(()=>{alert("Target disimpan!");document.getElementById('targetPanel').style.display='none';});
-}
-
-function simpanStok(){
-    const jenis=document.getElementById('stok-jenis').value;
-    const jumlah=parseFloat(document.getElementById('stok-jumlah').value)||0;
-    const ket=document.getElementById('stok-ket').value;
-    if(!jumlah) return alert("Masukkan jumlah!");
-    if(jenis==='set'){db.ref('stok_pakan/current').set(jumlah);}
-    else{db.ref('stok_pakan/current').once('value',snap=>{
-        const cur=snap.val()||0;
-        db.ref('stok_pakan/current').set(jenis==='masuk'?cur+jumlah:Math.max(0,cur-jumlah));
-    });}
-    db.ref('stok_pakan/history').push({tgl:new Date().toISOString().split('T')[0],jenis,jumlah,ket,ts:ServerValue.TIMESTAMP})
-    .then(()=>{alert("Stok diupdate!");document.getElementById('stokPanel').style.display='none';document.getElementById('stok-jumlah').value='';document.getElementById('stok-ket').value='';});
-}
-
-function simpanKesehatan(){
-    const tgl=document.getElementById('kes-tgl').value;
-    if(!tgl) return alert("Pilih tanggal!");
-    db.ref('kesehatan').push({
-        tgl,jenis:document.getElementById('kes-jenis').value,
-        kandang:document.getElementById('kes-kandang').value,
-        jumlah:parseInt(document.getElementById('kes-jumlah').value)||0,
-        ket:document.getElementById('kes-ket').value,ts:ServerValue.TIMESTAMP
-    }).then(()=>{alert("Catatan disimpan!");document.getElementById('kesPanel').style.display='none';document.getElementById('kes-jumlah').value='';document.getElementById('kes-ket').value='';});
-}
-
-function hapusKesehatan(id){if(!cekAdmin())return;if(confirm("Hapus catatan ini?")) db.ref('kesehatan/'+id).remove();}
-
-function renderCharts(){
-    if(!allDataCache)return;
-    const skrg=new Date();
-    const labels=[],oArr=[],bArr=[],lArr=[],sArr=[],pArr=[];
-    for(let i=29;i>=0;i--){
-        const d=new Date(skrg);d.setDate(d.getDate()-i);
-        const key=d.toISOString().split('T')[0];
-        labels.push(key.slice(5));
-        let o=0,b=0,kS=0,kP=0;
-        Object.values(allDataCache).forEach(item=>{
-            if(item.tgl===key){
-                o+=((item.kg_s||0)*(item.hrg_s||0))+((item.kg_p||0)*(item.hrg_p||0))+(item.masuk_lain||0);
-                b+=(item.pakan||0)+(item.gaji||0)+(item.keluar_lain||0);
-                kS+=(item.kg_s||0);kP+=(item.kg_p||0);
+    function cariData() {
+        const targetDate = document.getElementById('search-date').value;
+        if(!globalDataSnapshot) return;
+        let kgS = 0, kgP = 0, hrgS = 0, hrgP = 0, found = false;
+        Object.values(globalDataSnapshot).forEach(item => {
+            if(item.tgl === targetDate) {
+                kgS += (item.kg_s || 0); kgP += (item.kg_p || 0);
+                if(item.hrg_s > 0) hrgS = item.hrg_s;
+                if(item.hrg_p > 0) hrgP = item.hrg_p;
+                found = true;
             }
         });
-        oArr.push(o);bArr.push(b);lArr.push(o-b);sArr.push(kS);pArr.push(kP);
+        document.getElementById('search-result-area').style.display = 'block';
+        document.getElementById('res-hrg-s').textContent = formatRp(hrgS);
+        document.getElementById('res-hrg-p').textContent = formatRp(hrgP);
+        document.getElementById('res-kg-s').textContent = kgS.toFixed(2);
+        document.getElementById('res-kg-p').textContent = kgP.toFixed(2);
+        document.getElementById('res-total-kg').textContent = (kgS + kgP).toFixed(2) + " Kg";
+        if(!found) alert("Tidak ada data pada tanggal tersebut.");
     }
-    const cfg={responsive:true,plugins:{legend:{labels:{color:'#94A3B8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748B',maxRotation:45,font:{size:9}}},y:{ticks:{color:'#64748B',font:{size:9}}}}};
-    if(chartO)chartO.destroy();
-    chartO=new Chart(document.getElementById('chartOmset'),{type:'bar',data:{labels,datasets:[{label:'Omset',data:oArr,backgroundColor:'#10B98150',borderColor:'#10B981',borderWidth:1},{label:'Biaya',data:bArr,backgroundColor:'#EF444450',borderColor:'#EF4444',borderWidth:1}]},options:cfg});
-    if(chartL)chartL.destroy();
-    chartL=new Chart(document.getElementById('chartLaba'),{type:'line',data:{labels,datasets:[{label:'Laba',data:lArr,borderColor:'#F59E0B',backgroundColor:'#F59E0B20',fill:true,tension:0.3}]},options:cfg});
-    if(chartT)chartT.destroy();
-    chartT=new Chart(document.getElementById('chartTelur'),{type:'bar',data:{labels,datasets:[{label:'Super (Kg)',data:sArr,backgroundColor:'#F59E0B80',borderColor:'#F59E0B',borderWidth:1},{label:'Putih (Kg)',data:pArr,backgroundColor:'#94A3B880',borderColor:'#94A3B8',borderWidth:1}]},options:cfg});
-}
 
-function downloadPDF(){
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF();
-    const filterBln=document.getElementById('filter-bulan').value;
-    const bulanLabel=new Date(filterBln+'-01').toLocaleString('id-ID',{month:'long',year:'numeric'});
-    doc.setFontSize(18);doc.setTextColor(245,158,11);
-    doc.text("Najwafarm - Laporan Bulanan",14,20);
-    doc.setFontSize(11);doc.setTextColor(100);
-    doc.text("Periode: "+bulanLabel,14,30);
-    doc.setFontSize(10);doc.setTextColor(0);
-    doc.text("Total Omset      : "+document.getElementById('pub-masuk').textContent,14,42);
-    doc.text("Total Biaya      : "+document.getElementById('pub-keluar').textContent,14,50);
-    doc.text("Pemasukan Lain   : "+document.getElementById('pub-masuk-lain').textContent,14,58);
-    doc.text("Pengeluaran Lain : "+document.getElementById('pub-keluar-lain').textContent,14,66);
-    doc.text("Laba Bersih      : "+document.getElementById('pub-laba').textContent,14,74);
-    doc.text("Telur Super      : "+document.getElementById('pub-kg-super').textContent,14,82);
-    doc.text("Telur Putih      : "+document.getElementById('pub-kg-putih').textContent,14,90);
-    const filterKdg=document.getElementById('filter-kandang').value;
-    const rows=[];
-    if(allDataCache){
-        Object.entries(allDataCache)
-            .filter(([,item])=>item.tgl&&item.tgl.startsWith(filterBln)&&(filterKdg==='semua'||!item.kandang||item.kandang===filterKdg))
-            .sort((a,b)=>b[1].tgl.localeCompare(a[1].tgl))
-            .forEach(([,item])=>{
-                const biaya=(item.pakan||0)+(item.gaji||0)+(item.keluar_lain||0);
-                const omset=((item.kg_s||0)*(item.hrg_s||0))+((item.kg_p||0)*(item.hrg_p||0))+(item.masuk_lain||0);
-                rows.push([item.tgl.split('-').reverse().join('/'),item.kandang||'-',item.ket||'-',formatRp(biaya),formatRp(omset),formatRp(omset-biaya)]);
-            });
-    }
-    doc.autoTable({startY:98,head:[['Tanggal','Kandang','Keterangan','Biaya','Omset','Laba']],body:rows,styles:{fontSize:8},headStyles:{fillColor:[245,158,11],textColor:[0,0,0]},alternateRowStyles:{fillColor:[245,245,245]}});
-    doc.save(`Laporan_NajwaFarm_${filterBln}.pdf`);
-}
+    function muatData() {
+        const tglMulai = document.getElementById('f-mulai').value;
+        const tglSelesai = document.getElementById('f-selesai').value;
 
-// REALTIME
-db.ref('ternak_laporan').on('value',snap=>{allDataCache=snap.val()||{};loadData();});
-db.ref('settings/target_laba').on('value',snap=>{
-    targetLaba=snap.val()||0;
-    document.getElementById('target-label').textContent=targetLaba>0?'⚙️ Edit Target':'🎯 Set Target';
-    loadData();
-});
-db.ref('stok_pakan/current').on('value',snap=>{document.getElementById('stok-angka').textContent=(snap.val()||0).toLocaleString('id-ID');});
-db.ref('stok_pakan/history').on('value',snap=>{
-    const data=snap.val();
-    const tbody=document.getElementById('stok-tabel');
-    tbody.innerHTML='';
-    if(data){
-        Object.entries(data).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).forEach(([,item])=>{
-            const cls=item.jenis==='masuk'?'txt-green':'txt-red';
-            const sign=item.jenis==='masuk'?'+':item.jenis==='set'?'=':'-';
-            tbody.innerHTML+=`<tr><td>${item.tgl}</td><td class="${cls}">${sign} ${item.jenis}</td><td class="${cls}">${item.jumlah} Kg</td><td>${item.ket||'-'}</td></tr>`;
+        database.ref('ternak_laporan').on('value', (snapshot) => {
+            globalDataSnapshot = snapshot.val();
+            const tbody = document.getElementById('tabel-body');
+            tbody.innerHTML = "";
+            let sGlobal = 0, tMasukGlobal = 0, tKeluarGlobal = 0;
+
+            if (globalDataSnapshot) {
+                const sorted = Object.entries(globalDataSnapshot).sort((a, b) => b[1].tgl.localeCompare(a[1].tgl));
+                sorted.forEach(([id, item]) => {
+                    const biaya = (item.pakan || 0) + (item.gaji || 0) + (item.biaya_lain || 0);
+                    const omset = ((item.kg_s || 0) * (item.hrg_s || 0)) + ((item.kg_p || 0) * (item.hrg_p || 0)) + (item.masuk_lain || 0);
+                    const laba = omset - biaya;
+                    
+                    sGlobal += laba; 
+                    tMasukGlobal += omset; 
+                    tKeluarGlobal += biaya;
+
+                    if (item.tgl >= tglMulai && item.tgl <= tglSelesai) {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><b>${item.tgl.split('-').reverse().join('/')}</b><br><small>${item.ket}</small></td>
+                                <td><span class="txt-red">${formatRp(biaya)}</span></td>
+                                <td>
+                                    <span class="txt-green">${formatRp(omset)}</span><br>
+                                    <small style="color:${laba >= 0 ? 'var(--green)' : 'var(--red)'}">Laba: ${formatRp(laba)}</small>
+                                </td>
+                                <td>
+                                    ${is_admin ? `
+                                        <div style="display:flex; flex-direction:column; gap:5px;">
+                                            <button class="btn-edit" onclick="prepareEdit('${id}')">✏️ EDIT</button>
+                                            <button class="btn-delete" onclick="hapusData('${id}')">🗑️ HAPUS</button>
+                                        </div>
+                                    ` : '🔒'}
+                                </td>
+                            </tr>
+                        `;
+                    }
+                });
+            }
+            document.getElementById('saldo-global').textContent = formatRp(sGlobal);
+            document.getElementById('saldo-global').className = 'val ' + (sGlobal >= 0 ? 'txt-green' : 'txt-red');
+            document.getElementById('total-keluar-global').textContent = formatRp(tKeluarGlobal);
+            document.getElementById('total-masuk-global').textContent = formatRp(tMasukGlobal);
         });
     }
-});
-db.ref('kesehatan').on('value',snap=>{
-    const data=snap.val();
-    const tbody=document.getElementById('kes-tabel');
-    tbody.innerHTML='';
-    if(data){
-        const jM={vaksin:'💉 Vaksin',obat:'💊 Obat',sakit:'🤒 Sakit',mati:'💀 Mati'};
-        const cM={vaksin:'kes-vaksin',obat:'kes-obat',sakit:'kes-sakit',mati:'kes-mati'};
-        Object.entries(data).sort((a,b)=>b[1].tgl.localeCompare(a[1].tgl)).forEach(([id,item])=>{
-            const delBtn=is_admin?`<button class="btn-del" onclick="hapusKesehatan('${id}')">✖</button>`:'🔒';
-            tbody.innerHTML+=`<tr><td>${item.tgl}</td><td><span class="kes-badge ${cM[item.jenis]||''}">${jM[item.jenis]||item.jenis}</span></td><td>${item.kandang||'-'}</td><td>${item.ket||'-'}${item.jumlah>0?`<span class="sub-info">${item.jumlah} ekor</span>`:''}</td><td>${delBtn}</td></tr>`;
-        });
-    }
-});
 
-// INIT
-isiFilterBulan();
-document.getElementById('kes-tgl').valueAsDate=new Date();
-document.getElementById('cari-tgl-telur').valueAsDate=new Date();
-document.getElementById('cari-tgl-harga').valueAsDate=new Date();
-document.getElementById('cari-tgl-lain').valueAsDate=new Date();
+    muatData();
 </script>
 </body>
 </html>
