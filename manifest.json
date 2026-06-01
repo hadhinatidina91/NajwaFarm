@@ -1,0 +1,22 @@
+{
+  "name": "Simpanan Raya 2026",
+  "short_name": "Sariya",
+  "description": "Aplikasi Simpanan Raya 2026",
+  "start_url": "/NajwaFarm/sariya2026.html",
+  "display": "standalone",
+  "background_color": "#0d0a1e",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/f59e0b/1a0a00?text=SR",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/f59e0b/1a0a00?text=SR",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
