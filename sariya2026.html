@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🌙 Simpanan Raya 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@400;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: #0d0a1e;
+    font-family: 'Poppins', sans-serif;
+    color: #f1e8d0;
+    overflow-x: hidden;
+  }
+
+  .stars {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background:
+      radial-gradient(1px 1px at 10% 15%, #f59e0b88, transparent),
+      radial-gradient(1px 1px at 25% 8%, #ffffffaa, transparent),
+      radial-gradient(1px 1px at 40% 20%, #f59e0b66, transparent),
+      radial-gradient(1px 1px at 55% 5%, #ffffffaa, transparent),
+      radial-gradient(1px 1px at 70% 18%, #f59e0b88, transparent),
+      radial-gradient(1px 1px at 85% 10%, #ffffffaa, transparent),
+      radial-gradient(1px 1px at 95% 25%, #f59e0b66, transparent),
+      radial-gradient(1px 1px at 15% 40%, #ffffffaa, transparent),
+      radial-gradient(1px 1px at 60% 35%, #f59e0b88, transparent),
+      radial-gradient(1px 1px at 80% 45%, #ffffffaa, transparent),
+      radial-gradient(2px 2px at 30% 30%, #f59e0baa, transparent),
+      radial-gradient(2px 2px at 75% 28%, #ffffffcc, transparent);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container {
+    padding: 1.5rem 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  .ornamen {
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 6px;
+    color: #f59e0b;
+    margin-bottom: 6px;
+  }
+
+  .login-box {
+    background: linear-gradient(160deg, #1e1040 0%, #0f1a3a 100%);
+    border-radius: 24px;
+    padding: 2rem 1.5rem;
+    border: 1px solid #f59e0b44;
+    text-align: center;
+    margin-top: 10vh;
+    box-shadow: 0 0 40px #f59e0b22, 0 20px 60px #00000066;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-box::before {
+    content: '';
+    position: absolute; top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, #f59e0b22 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .login-title {
+    font-family: 'Amiri', serif;
+    font-size: 26px;
+    color: #f59e0b;
+    margin-bottom: 2px;
+  }
+
+  .login-subtitle {
+    font-size: 12px;
+    color: #a78bfa;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .login-bulan {
+    font-size: 52px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 12px #f59e0b88);
+    display: block;
+  }
+
+  select, input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: #0d0a1e99;
+    border: 1px solid #f59e0b44;
+    color: #f1e8d0;
+    margin-bottom: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  select:focus, input:focus { border-color: #f59e0b; }
+  select option { background: #1e1040; }
+
+  .btn {
+    width: 100%; padding: 0.85rem;
+    border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #b45309, #f59e0b);
+    color: #1a0a00; font-weight: 700;
+    cursor: pointer; font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 4px 15px #f59e0b44;
+    transition: transform 0.1s;
+  }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #991b1b, #ef4444);
+    color: #fff; padding: 4px 10px;
+    font-size: 11px; width: auto; box-shadow: none;
+  }
+
+  .btn-green {
+    background: linear-gradient(135deg, #065f46, #10b981);
+    color: #fff; font-size: 14px;
+    box-shadow: 0 4px 12px #10b98133;
+  }
+
+  .dash-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #1e1040, #0f1a3a);
+    padding: 12px 16px; border-radius: 14px;
+    border: 1px solid #f59e0b33;
+  }
+  .dash-header h3 { color: #f59e0b; font-size: 15px; }
+  .btn-keluar {
+    background: none; border: 1px solid #f59e0b44;
+    color: #a78bfa; cursor: pointer; padding: 5px 12px;
+    border-radius: 8px; font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .card {
+    background: linear-gradient(135deg, #7c3aed, #b45309, #f59e0b);
+    border-radius: 18px; padding: 1.4rem 1.5rem;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 30px #7c3aed44;
+    position: relative; overflow: hidden;
+  }
+  .card::after {
+    content: 'x';
+    font-size: 0;
+    position: absolute; right: 16px; top: 50%;
+    transform: translateY(-50%);
+  }
+  .card h3 { font-size: 20px; color: #fff; }
+  .card p { font-size: 12px; color: #fde68a; margin-top: 4px; }
+
+  .tabs { display: flex; gap: 10px; margin-bottom: 14px; }
+  .tab {
+    flex: 1; padding: 10px; text-align: center;
+    background: #1e1040; border-radius: 12px;
+    cursor: pointer; font-size: 13px;
+    border: 1px solid #f59e0b22;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, #b45309, #f59e0b);
+    color: #1a0a00; font-weight: 700;
+    border-color: transparent;
+  }
+
+  .status-terlambat {
+    background: #fee2e2; color: #b91c1c;
+    padding: 2px 8px; border-radius: 20px;
+    font-weight: 700; font-size: 11px;
+  }
+  .status-lunas {
+    background: #d1fae5; color: #065f46;
+    padding: 2px 8px; border-radius: 20px;
+    font-weight: 700; font-size: 11px;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse;
+    background: #1e1040; border-radius: 14px;
+    overflow: hidden; margin-top: 8px;
+    border: 1px solid #f59e0b22;
+  }
+  th, td { padding: 11px 12px; text-align: left; border-bottom: 1px solid #f59e0b11; font-size: 13px; }
+  th { background: #2d1b69; color: #f59e0b; font-size: 12px; }
+  tr:last-child td { border-bottom: none; }
+
+  .member-card {
+    background: linear-gradient(160deg, #1e1040, #0f1a3a);
+    padding: 15px; border-radius: 14px;
+    margin-bottom: 14px;
+    border: 1px solid #f59e0b33;
+  }
+
+  .tambah-box {
+    background: linear-gradient(160deg, #052e16, #0a1628);
+    border: 1.5px dashed #10b98188;
+    border-radius: 14px; padding: 15px; margin-bottom: 18px;
+  }
+  .tambah-box h4 { color: #34d399; margin-bottom: 12px; font-size: 14px; }
+  .form-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .form-row input { margin: 0; flex: 1; }
+
+  .riwayat-item {
+    display: flex; justify-content: space-between;
+    background: #0d0a1e; padding: 6px 10px;
+    border-radius: 8px; margin-top: 5px;
+    font-size: 12px; border: 1px solid #f59e0b11;
+    align-items: center;
+  }
+
+  #sync-status { font-size: 12px; color: #a78bfa; margin-bottom: 18px; }
+
+  .divider { text-align: center; color: #f59e0b55; font-size: 13px; letter-spacing: 6px; margin: 14px 0; }
+  .section-label { font-size: 11px; color: #a78bfa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .tarif-badge { font-size: 11px; color: #a78bfa; background: #2d1b6933; padding: 3px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div id="app">
+  <div id="login-screen" class="container">
+    <div class="login-box">
+      <div class="ornamen">❖ ✦ ❖ ✦ ❖</div>
+      <span class="login-bulan">🌙</span>
+      <h2 class="login-title">Simpanan Raya 2026</h2>
+      <p class="login-subtitle">Marhaban Ya Ramadhan 🕌</p>
+      <p id="sync-status">Menghubungkan...</p>
+      <select id="sel-nama">
+        <option value="">— Pilih Nama —</option>
+        <option value="admin">👑 Admin</option>
+      </select>
+      <input type="password" id="inp-pin" placeholder="🔑 Masukkan PIN"/>
+      <button class="btn" onclick="window.doLogin()">🌟 Masuk</button>
+      <div class="divider">❖ ✦ ❖ ✦ ❖</div>
+      <p style="font-size:12px; color:#64748b; margin-top:4px;">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
+    </div>
+  </div>
+
+  <div id="dashboard" class="container" style="display:none;">
+    <div class="dash-header">
+      <h3>🌙 <span id="user-name"></span></h3>
+      <button class="btn-keluar" onclick="location.reload()">Keluar ↩</button>
+    </div>
+    <div id="main-content"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDbwSAS7uZ-TVZlSn97WP9sNU3JXYQeMvA",
+    authDomain: "tabungan-hariraya.firebaseapp.com",
+    databaseURL: "https://tabungan-hariraya-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "tabungan-hariraya",
+    storageBucket: "tabungan-hariraya.firebasestorage.app",
+    messagingSenderId: "1033743274448",
+    appId: "1:1033743274448:web:7ad4afe9164118e45369d5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db_fb = getDatabase(app);
+  const rootRef = ref(db_fb, 'simpanan_v4');
+
+  const JADWAL = [];
+  const start = new Date("2026-03-30");
+  for (let i = 0; i < 45; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i * 7);
+    JADWAL.push(d.toISOString().split("T")[0]);
+  }
+
+  let db = {
+    members: {
+      ipah:     { nama: "Mbak Ipah",    setor: 100000, pin: "1234", setoran: [] },
+      tatik:    { nama: "Mbak Tatik",   setor: 100000, pin: "1234", setoran: [] },
+      titin:    { nama: "Titin",        setor: 100000, pin: "1234", setoran: [] },
+      fiqoh:    { nama: "Fiqoh",        setor: 100000, pin: "1234", setoran: [] },
+      lia:      { nama: "Lia",          setor: 200000, pin: "1234", setoran: [] },
+      sakdiyah: { nama: "Hj. Sakdiyah", setor: 100000, pin: "1234", setoran: [] }
+    },
+    adminPin: "9999"
+  };
+
+  function rebuildDropdown() {
+    const sel = document.getElementById("sel-nama");
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Pilih Nama —</option><option value="admin">👑 Admin</option>';
+    Object.entries(db.members).forEach(([key, m]) => {
+      const opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = `${m.nama} (${m.setor/1000}rb)`;
+      sel.appendChild(opt);
+    });
+  }
+
+  onValue(rootRef, (snapshot) => {
+    if (snapshot.exists()) {
+      db = snapshot.val();
+      document.getElementById("sync-status").innerText = "☁️ Cloud Terhubung ✅";
+    } else {
+      set(rootRef, db);
+    }
+    rebuildDropdown();
+  });
+
+  window.doLogin = function() {
+    const userKey = document.getElementById("sel-nama").value;
+    const pin = document.getElementById("inp-pin").value;
+    if (userKey === "admin" && pin === db.adminPin) { renderAdmin(); }
+    else if (db.members[userKey] && db.members[userKey].pin === pin) { renderMember(userKey, 'jadwal'); }
+    else { alert("PIN Salah! Coba lagi."); }
+  };
+
+  window.renderMember = function(key, tab) {
+    const m = db.members[key];
+    const sMap = {}; (m.setoran || []).forEach(s => sMap[s.minggu] = s.tgl);
+    const today = new Date().toISOString().split("T")[0];
+    const total = (m.setoran||[]).length * m.setor;
+
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("user-name").innerText = m.nama;
+
+    let content = `
+      <div class="card">
+        <p class="section-label" style="color:#fde68a; text-transform:none; font-size:12px;">💰 Total Simpanan</p>
+        <h3>Rp ${total.toLocaleString('id-ID')}</h3>
+        <p>${(m.setoran||[]).length} minggu dari 45 minggu ✨</p>
+      </div>
+      <div class="tabs">
+        <div class="tab ${tab==='jadwal'?'active':''}" onclick="renderMember('${key}','jadwal')">🗓 Jadwal</div>
+        <div class="tab ${tab==='riwayat'?'active':''}" onclick="renderMember('${key}','riwayat')">📜 Riwayat</div>
+      </div>`;
+
+    if (tab === 'jadwal') {
+      let rows = JADWAL.map((tglJadwal, i) => {
+        const mgg = i + 1;
+        const lunas = sMap[mgg];
+        const lewat = tglJadwal < today;
+        let status = lunas
+          ? '<span class="status-lunas">✅ Lunas</span>'
+          : (lewat ? '<span class="status-terlambat">⚠️ Terlambat</span>' : '🗓 Jadwal');
+        return `<tr><td>${mgg}</td><td>${tglJadwal}</td><td>${status}</td></tr>`;
+      }).join("");
+      content += `<table><thead><tr><th>Mgg</th><th>Jadwal</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+    } else {
+      let rows = (m.setoran || []).map(s =>
+        `<tr><td>Mgg ${s.minggu}</td><td>${s.tgl}</td><td><span class="status-lunas">✅ Lunas</span></td></tr>`
+      ).join("");
+      content += rows
+        ? `<table><thead><tr><th>Ket</th><th>Tgl Bayar</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`
+        : `<p style="text-align:center; padding:30px; color:#a78bfa;">🌙 Belum ada riwayat setoran.</p>`;
+    }
+    document.getElementById("main-content").innerHTML = content;
+  };
+
+  function renderAdmin() {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("user-name").innerText = "Admin Panel 👑";
+
+    let html = `
+      <div class="tambah-box">
+        <h4>➕ Tambah Peserta Baru</h4>
+        <div class="form-row">
+          <input type="text" id="new-nama" placeholder="Nama lengkap" />
+          <input type="number" id="new-setor" placeholder="Tarif/mgg (Rp)" />
+        </div>
+        <div class="form-row">
+          <input type="text" id="new-pin" placeholder="PIN (default: 1234)" />
+        </div>
+        <button class="btn btn-green" onclick="window.tambahPeserta()">💾 Simpan Peserta</button>
+      </div>`;
+
+    Object.entries(db.members).forEach(([key, m]) => {
+      let riwayatHtml = (m.setoran || []).map((s, index) => `
+        <div class="riwayat-item">
+          <span>🗓 Mgg ${s.minggu} &nbsp;(${s.tgl})</span>
+          <button class="btn btn-danger" onclick="window.delS('${key}', ${index})">Hapus</button>
+        </div>`).join("");
+
+      html += `
+        <div class="member-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#f59e0b; font-size:15px;">${m.nama}</strong>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <span class="tarif-badge">${m.setor/1000}rb/mgg</span>
+              <button class="btn btn-danger" onclick="window.hapusPeserta('${key}', '${m.nama}')">🗑</button>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <input type="number" id="amt-${key}" placeholder="Jumlah Rp" style="margin:0; flex:1;">
+            <input type="date" id="d-${key}" style="width:135px; margin:0;">
+            <button class="btn" onclick="window.processAuto('${key}')" style="width:auto; padding:6px 14px; margin:0; font-size:13px;">Input</button>
+          </div>
+          <div style="margin-top:10px; border-top:1px solid #f59e0b22; padding-top:10px;">
+            <p class="section-label">Riwayat / Kelola:</p>
+            ${riwayatHtml || '<p style="font-size:11px; color:#475569; padding:4px 0;">Belum ada setoran.</p>'}
+          </div>
+        </div>`;
+    });
+
+    document.getElementById("main-content").innerHTML = html;
+  }
+
+  window.tambahPeserta = () => {
+    const nama = document.getElementById("new-nama").value.trim();
+    const setor = parseInt(document.getElementById("new-setor").value);
+    const pin = document.getElementById("new-pin").value.trim() || "1234";
+    if (!nama) return alert("Nama tidak boleh kosong!");
+    if (!setor || setor < 1000) return alert("Isi tarif setoran per minggu!");
+    let key = nama.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!key) key = "peserta" + Date.now();
+    if (db.members[key]) key = key + Object.keys(db.members).length;
+    db.members[key] = { nama, setor, pin, setoran: [] };
+    set(rootRef, db);
+    alert(`Peserta "${nama}" berhasil ditambahkan!\nPIN: ${pin}`);
+    renderAdmin();
+  };
+
+  window.hapusPeserta = (key, nama) => {
+    if (!confirm(`Hapus peserta "${nama}"?\nTidak bisa dibatalkan!`)) return;
+    delete db.members[key];
+    set(rootRef, db);
+    alert(`Peserta "${nama}" telah dihapus.`);
+    renderAdmin();
+  };
+
+  window.processAuto = (key) => {
+    const amount = parseInt(document.getElementById("amt-"+key).value);
+    const tgl = document.getElementById("d-"+key).value;
+    const m = db.members[key];
+    if (!amount || !tgl) return alert("Isi Rp dan Tanggal!");
+    const jumlahMinggu = Math.floor(amount / m.setor);
+    if (jumlahMinggu < 1) return alert("Jumlah tidak cukup untuk 1 minggu!");
+    if (!m.setoran) m.setoran = [];
+    const lastMgg = m.setoran.length > 0 ? Math.max(...m.setoran.map(s => s.minggu)) : 0;
+    for (let i = 1; i <= jumlahMinggu; i++) {
+      m.setoran.push({ minggu: lastMgg + i, tgl: tgl });
+    }
+    set(rootRef, db);
+    alert(`Berhasil! Tercatat ${jumlahMinggu} minggu.`);
+    renderAdmin();
+  };
+
+  window.delS = (key, index) => {
+    if (confirm("Hapus data ini?")) {
+      db.members[key].setoran.splice(index, 1);
+      set(rootRef, db);
+      renderAdmin();
+    }
+  };
+</script>
+</body>
+</html>
