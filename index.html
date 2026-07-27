@@ -35,7 +35,12 @@
         .filter-box { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
         .filter-group { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
         .filter-group div { flex: 1; min-width: 120px; }
-        
+        .filter-quick { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .btn-quick { background: #334155; color: var(--text); border: 1px solid #475569; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; }
+        .btn-quick:hover { border-color: var(--primary); color: var(--primary); }
+
+        .period-label { text-align: center; font-size: 11px; color: #94A3B8; margin-top: -12px; margin-bottom: 15px; }
+
         .admin-trigger { 
             position: fixed; bottom: 20px; right: 20px; 
             background: var(--primary); color: #0F172A; 
@@ -100,7 +105,7 @@
         <h1>Najwafarm 🐔</h1>
         <p style="color: #94A3B8; margin-bottom: 20px; font-size: 14px;">Laporan Keuangan & Produksi</p>
 
-        <div class="section-title">Ringkasan Saldo Global</div>
+        <div class="section-title">Ringkasan Saldo <span id="periode-title">(Sesuai Filter)</span></div>
         <div class="dashboard-grid">
             <div class="stat-box full-width">
                 <h4>Saldo Keuntungan Bersih</h4>
@@ -144,14 +149,22 @@
             </div>
         </div>
 
-        <div class="section-title">Tabel Laporan Berkala</div>
+        <div class="section-title">Tabel Laporan Berkala &amp; Filter Saldo</div>
         <div class="filter-box">
             <div class="filter-group">
                 <div><label>Dari</label><input type="date" id="f-mulai"></div>
                 <div><label>Sampai</label><input type="date" id="f-selesai"></div>
                 <button class="btn-action" onclick="muatData()">FILTER</button>
             </div>
+            <div class="filter-quick">
+                <button class="btn-quick" onclick="setPeriodeHariIni()">Hari Ini</button>
+                <button class="btn-quick" onclick="setPeriodeBulanIni()">Bulan Ini</button>
+                <button class="btn-quick" onclick="setPeriodeBulanLalu()">Bulan Lalu</button>
+                <button class="btn-quick" onclick="setPeriodeTahunIni()">Tahun Ini</button>
+                <button class="btn-quick" onclick="setPeriodeSemua()">Semua Data</button>
+            </div>
         </div>
+        <div class="period-label" id="periode-info"></div>
 
         <div class="table-container">
             <table>
@@ -184,7 +197,7 @@
     let is_admin = false;
     let globalDataSnapshot = null;
 
-    // Inisialisasi Tanggal
+    // Inisialisasi Tanggal (default: bulan berjalan)
     const now = new Date();
     document.getElementById('f-mulai').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     document.getElementById('f-selesai').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
@@ -195,6 +208,38 @@
     function bersihAngka(str) { 
         if(typeof str === 'number') return str;
         return parseFloat(str.replace(/\./g, '')) || 0; 
+    }
+    function toISO(d) { return d.toISOString().split('T')[0]; }
+
+    // ==== TOMBOL PINTAS PERIODE ====
+    function setPeriodeHariIni() {
+        const t = new Date();
+        document.getElementById('f-mulai').value = toISO(t);
+        document.getElementById('f-selesai').value = toISO(t);
+        muatData();
+    }
+    function setPeriodeBulanIni() {
+        const t = new Date();
+        document.getElementById('f-mulai').value = toISO(new Date(t.getFullYear(), t.getMonth(), 1));
+        document.getElementById('f-selesai').value = toISO(new Date(t.getFullYear(), t.getMonth() + 1, 0));
+        muatData();
+    }
+    function setPeriodeBulanLalu() {
+        const t = new Date();
+        document.getElementById('f-mulai').value = toISO(new Date(t.getFullYear(), t.getMonth() - 1, 1));
+        document.getElementById('f-selesai').value = toISO(new Date(t.getFullYear(), t.getMonth(), 0));
+        muatData();
+    }
+    function setPeriodeTahunIni() {
+        const t = new Date();
+        document.getElementById('f-mulai').value = toISO(new Date(t.getFullYear(), 0, 1));
+        document.getElementById('f-selesai').value = toISO(new Date(t.getFullYear(), 11, 31));
+        muatData();
+    }
+    function setPeriodeSemua() {
+        document.getElementById('f-mulai').value = "2000-01-01";
+        document.getElementById('f-selesai').value = "2099-12-31";
+        muatData();
     }
 
     // Input Auto Formatting Rupiah
@@ -313,9 +358,13 @@
         if(!found) alert("Tidak ada data pada tanggal tersebut.");
     }
 
+    // ==== MUAT DATA: saldo & ringkasan sekarang MENGIKUTI rentang filter, bukan total semua data ====
     function muatData() {
         const tglMulai = document.getElementById('f-mulai').value;
         const tglSelesai = document.getElementById('f-selesai').value;
+
+        document.getElementById('periode-info').textContent =
+            "Menampilkan periode: " + tglMulai.split('-').reverse().join('/') + " s/d " + tglSelesai.split('-').reverse().join('/');
 
         database.ref('ternak_laporan').on('value', (snapshot) => {
             globalDataSnapshot = snapshot.val();
@@ -329,12 +378,13 @@
                     const biaya = (item.pakan || 0) + (item.gaji || 0) + (item.biaya_lain || 0);
                     const omset = ((item.kg_s || 0) * (item.hrg_s || 0)) + ((item.kg_p || 0) * (item.hrg_p || 0)) + (item.masuk_lain || 0);
                     const laba = omset - biaya;
-                    
-                    sGlobal += laba; 
-                    tMasukGlobal += omset; 
-                    tKeluarGlobal += biaya;
 
+                    // Hanya masuk hitungan ringkasan & tabel kalau tanggalnya ada di rentang filter
                     if (item.tgl >= tglMulai && item.tgl <= tglSelesai) {
+                        sGlobal += laba;
+                        tMasukGlobal += omset;
+                        tKeluarGlobal += biaya;
+
                         tbody.innerHTML += `
                             <tr>
                                 <td><b>${item.tgl.split('-').reverse().join('/')}</b><br><small>${item.ket}</small></td>
