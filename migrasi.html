@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migrasi Data Najwafarm</title>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+<style>
+body { font-family:'Segoe UI',sans-serif; background:#0F172A; color:#F1F5F9; margin:0; padding:20px; }
+.box { max-width:600px; margin:0 auto; background:#1E293B; border-radius:12px; padding:20px; border:1px solid #334155; }
+h1 { color:#F59E0B; font-size:1.3rem; }
+button { background:#F59E0B; border:none; padding:14px 20px; border-radius:8px; font-weight:bold; cursor:pointer; color:#0F172A; width:100%; font-size:1rem; margin-top:15px; }
+button:disabled { opacity:0.5; cursor:not-allowed; }
+#log { background:#0F172A; border-radius:8px; padding:12px; margin-top:15px; font-size:12px; max-height:400px; overflow-y:auto; white-space:pre-wrap; font-family:monospace; border:1px solid #334155; }
+.warn { background:#3f2d0a; border:1px solid #F59E0B; border-radius:8px; padding:12px; font-size:13px; margin-bottom:10px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🔄 Migrasi Data Najwafarm</h1>
+  <div class="warn">
+    Alat ini membaca semua data lama dari node <b>ternak_laporan</b> dan menyalinnya ke struktur baru <b>transaksi</b> (dipakai dashboard versi baru).
+    <br><br>
+    • Data lama di <b>ternak_laporan</b> TIDAK dihapus — tetap aman sebagai cadangan.<br>
+    • Karena data lama cuma nyimpen total pakan harian (bukan per-item FIN LA/FIN LA LX dll), hasil migrasi pakan akan jadi 1 baris "Pakan (Migrasi)" per hari, bukan rincian per material.<br>
+    • Proses ini aman dijalankan berkali-kali? <b>TIDAK</b> — jalankan cuma SEKALI, kalau dijalankan 2x datanya akan dobel.
+  </div>
+  <button id="btn-cek" onclick="cekData()">1. CEK JUMLAH DATA LAMA</button>
+  <button id="btn-migrasi" onclick="jalankanMigrasi()" disabled>2. JALANKAN MIGRASI</button>
+  <div id="log"></div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDbwSAS7uZ-TVZlSn97WP9sNU3JXYQeMvA",
+  authDomain: "najwafarm-dd1be.firebaseapp.com",
+  databaseURL: "https://najwafarm-dd1be-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "najwafarm-dd1be",
+  storageBucket: "najwafarm-dd1be.appspot.com",
+  messagingSenderId: "1033743274448",
+  appId: "1:1033743274448:web:6ad64eff21baaadc5369d5"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+let dataLama = null;
+
+function tulisLog(msg){
+  document.getElementById('log').textContent += msg + "\n";
+  document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+}
+
+function cekData(){
+  const pin = prompt("Masukkan PIN Admin:");
+  if(pin !== "9999"){ alert("PIN salah!"); return; }
+
+  document.getElementById('log').textContent = "";
+  tulisLog("Membaca node ternak_laporan...");
+  database.ref('ternak_laporan').once('value').then(snap => {
+    dataLama = snap.val();
+    if(!dataLama){ tulisLog("Tidak ada data lama ditemukan."); return; }
+    const jumlah = Object.keys(dataLama).length;
+    tulisLog("Ditemukan " + jumlah + " baris data harian lama.");
+    tulisLog("Siap dimigrasi. Klik tombol 2 untuk lanjut.");
+    document.getElementById('btn-migrasi').disabled = false;
+  }).catch(e => tulisLog("Gagal baca data: " + e.message));
+}
+
+function jalankanMigrasi(){
+  if(!dataLama){ alert("Cek data dulu (tombol 1)."); return; }
+  if(!confirm("Yakin jalankan migrasi sekarang? Proses ini cuma boleh dijalankan SEKALI.")) return;
+
+  document.getElementById('btn-migrasi').disabled = true;
+  tulisLog("\n--- MULAI MIGRASI ---");
+  const entries = Object.entries(dataLama);
+  let selesai = 0, dibuat = 0;
+
+  const tugas = [];
+
+  entries.forEach(([oldId, item]) => {
+    const tgl = item.tgl;
+    if(!tgl) return;
+
+    // Pakan
+    if(item.pakan && item.pakan > 0){
+      tugas.push({ tgl, kategori:'pakan_ovk', material:'Pakan (Migrasi)', satuan:'Paket', qty:1, harga:item.pakan, total:item.pakan, no_dok:'', ket: item.ket || 'Migrasi dari data lama' });
+    }
+    // Gaji
+    if(item.gaji && item.gaji > 0){
+      tugas.push({ tgl, kategori:'gaji_lain', jenis:'gaji', total:item.gaji, ket: item.ket || 'Migrasi dari data lama' });
+    }
+    // Biaya lain -> deteksi kasbon/bon dari keterangan
+    if(item.biaya_lain && item.biaya_lain > 0){
+      const ketLower = (item.ket || '').toLowerCase();
+      if(ketLower.includes('bon')){
+        tugas.push({ tgl, kategori:'pembayaran', jenis:'hutang', total:item.biaya_lain, ket: item.ket || 'Migrasi dari data lama' });
+      } else {
+        tugas.push({ tgl, kategori:'gaji_lain', jenis:'biaya_lain', total:item.biaya_lain, ket: item.ket || 'Migrasi dari data lama' });
+      }
+    }
+    // Telur Super
+    if(item.kg_s && item.kg_s > 0){
+      tugas.push({ tgl, kategori:'telur', material:'Super', qty:item.kg_s, harga:item.hrg_s||0, total:(item.kg_s*(item.hrg_s||0)), no_dok:'', ket: item.ket || 'Migrasi dari data lama' });
+    }
+    // Telur Putih
+    if(item.kg_p && item.kg_p > 0){
+      tugas.push({ tgl, kategori:'telur', material:'Putih', qty:item.kg_p, harga:item.hrg_p||0, total:(item.kg_p*(item.hrg_p||0)), no_dok:'', ket: item.ket || 'Migrasi dari data lama' });
+    }
+    // Pemasukan lain
+    if(item.masuk_lain && item.masuk_lain > 0){
+      tugas.push({ tgl, kategori:'gaji_lain', jenis:'pemasukan_lain', total:item.masuk_lain, ket: item.ket || 'Migrasi dari data lama' });
+    }
+  });
+
+  tulisLog("Total " + tugas.length + " transaksi baru akan dibuat dari " + entries.length + " baris lama...");
+
+  const simpanSatu = (i) => {
+    if(i >= tugas.length){
+      tulisLog("\n--- SELESAI ---");
+      tulisLog("Berhasil migrasi " + dibuat + " transaksi.");
+      tulisLog("Silakan buka dashboard baru untuk cek hasilnya.");
+      return;
+    }
+    database.ref('transaksi').push().set(tugas[i]).then(() => {
+      dibuat++;
+      selesai++;
+      if(selesai % 10 === 0) tulisLog("Progres: " + selesai + "/" + tugas.length);
+      simpanSatu(i+1);
+    }).catch(e => {
+      tulisLog("Gagal simpan baris " + i + ": " + e.message);
+      simpanSatu(i+1);
+    });
+  };
+  simpanSatu(0);
+}
+</script>
+</body>
+</html>
