@@ -1,419 +1,439 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Najwafarm Pro - Dashboard Keluarga</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
-    <style>
-        :root { 
-            --primary: #F59E0B; --bg: #0F172A; --card: #1E293B; 
-            --text: #F1F5F9; --green: #10B981; --red: #EF4444; 
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
-        
-        .main-display { width: 100%; max-width: 1000px; margin: 0 auto; padding: 20px 15px; box-sizing: border-box; padding-bottom: 100px; }
-        h1 { color: var(--primary); font-size: 1.8rem; margin: 0; }
-        
-        .section-title { font-size: 12px; color: #94A3B8; margin: 25px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-
-        .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-box { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #334155; }
-        .stat-box h4 { margin: 0; font-size: 0.7rem; color: #94A3B8; text-transform: uppercase; }
-        .val { font-size: 1.2rem; font-weight: bold; display: block; margin-top: 5px; }
-        .full-width { grid-column: span 2; border: 2px solid var(--primary); }
-
-        .search-box { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--primary); }
-        .search-result { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #475569; }
-        .res-item { background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; }
-        .res-item small { color: #94A3B8; font-size: 10px; text-transform: uppercase; }
-        .res-item b { display: block; font-size: 14px; margin-top: 2px; }
-
-        .filter-box { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
-        .filter-group { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-        .filter-group div { flex: 1; min-width: 120px; }
-        .filter-quick { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .btn-quick { background: #334155; color: var(--text); border: 1px solid #475569; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; }
-        .btn-quick:hover { border-color: var(--primary); color: var(--primary); }
-
-        .period-label { text-align: center; font-size: 11px; color: #94A3B8; margin-top: -12px; margin-bottom: 15px; }
-
-        .admin-trigger { 
-            position: fixed; bottom: 20px; right: 20px; 
-            background: var(--primary); color: #0F172A; 
-            border: none; padding: 15px 25px; 
-            border-radius: 50px; cursor: pointer; z-index: 1000; 
-            font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .admin-panel { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 2000; padding: 15px; overflow-y: auto; }
-        .panel-content { max-width: 500px; margin: 10px auto; background: var(--card); padding: 25px; border-radius: 15px; }
-
-        .table-container { background: var(--card); border-radius: 12px; overflow-x: auto; border: 1px solid #334155; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 550px; }
-        th { background: #334155; padding: 12px; color: #94A3B8; text-align: left; }
-        td { padding: 15px 12px; border-bottom: 1px solid #0F172A; vertical-align: top; }
-        
-        .txt-red { color: var(--red); }
-        .txt-green { color: var(--green); }
-        input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #475569; background: #0F172A; color: white; box-sizing: border-box; }
-        .btn-action { background: var(--primary); border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #0F172A; }
-        .btn-edit { background: #334155; color: var(--primary); border: 1px solid var(--primary); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; margin-right: 5px; }
-        .btn-delete { background: transparent; color: var(--red); border: 1px solid var(--red); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Najwafarm Pro - Dashboard Keluarga</title>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+<style>
+:root { --primary:#F59E0B; --bg:#0F172A; --card:#1E293B; --text:#F1F5F9; --green:#10B981; --red:#EF4444; --blue:#38BDF8; }
+body { font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; }
+.main-display { width:100%; max-width:1000px; margin:0 auto; padding:20px 15px; box-sizing:border-box; padding-bottom:100px; }
+h1 { color:var(--primary); font-size:1.8rem; margin:0; }
+.section-title { font-size:12px; color:#94A3B8; margin:25px 0 10px 0; text-transform:uppercase; letter-spacing:1px; font-weight:bold; }
+.ledger-card { background:var(--card); border:2px solid var(--primary); border-radius:12px; overflow-x:auto; margin-bottom:10px; }
+.ledger-card table { width:100%; border-collapse:collapse; min-width:600px; }
+.ledger-card th { background:#334155; padding:10px; font-size:10px; color:#94A3B8; text-transform:uppercase; text-align:right; }
+.ledger-card th:first-child, .ledger-card td:first-child { text-align:left; }
+.ledger-card td { padding:14px 10px; text-align:right; font-weight:bold; font-size:0.95rem; }
+.dashboard-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:20px; }
+.stat-box { background:var(--card); padding:15px; border-radius:12px; border:1px solid #334155; }
+.stat-box h4 { margin:0; font-size:0.7rem; color:#94A3B8; text-transform:uppercase; }
+.val { font-size:1.2rem; font-weight:bold; display:block; margin-top:5px; }
+.full-width { grid-column:span 2; }
+.filter-box { background:#1e293b; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #334155; }
+.filter-group { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; }
+.filter-group div { flex:1; min-width:120px; }
+.filter-quick { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.btn-quick { background:#334155; color:var(--text); border:1px solid #475569; padding:6px 12px; border-radius:20px; font-size:11px; cursor:pointer; }
+.btn-quick:hover { border-color:var(--primary); color:var(--primary); }
+.period-label { text-align:center; font-size:11px; color:#94A3B8; margin-top:-12px; margin-bottom:15px; }
+.admin-trigger { position:fixed; bottom:20px; right:20px; background:var(--primary); color:#0F172A; border:none; padding:15px 25px; border-radius:50px; cursor:pointer; z-index:1000; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.5); }
+.admin-panel { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.98); z-index:2000; padding:15px; overflow-y:auto; }
+.panel-content { max-width:500px; margin:10px auto; background:var(--card); padding:25px; border-radius:15px; }
+.table-container { background:var(--card); border-radius:12px; overflow-x:auto; border:1px solid #334155; margin-bottom:15px; }
+table.data-table { width:100%; border-collapse:collapse; font-size:0.78rem; min-width:600px; }
+.data-table th { background:#334155; padding:10px; color:#94A3B8; text-align:left; }
+.data-table td { padding:12px 10px; border-bottom:1px solid #0F172A; vertical-align:top; }
+.txt-red { color:var(--red); } .txt-green { color:var(--green); } .txt-blue { color:var(--blue); }
+input, select { width:100%; padding:10px; margin-top:5px; border-radius:8px; border:1px solid #475569; background:#0F172A; color:white; box-sizing:border-box; }
+.btn-action { background:var(--primary); border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer; color:#0F172A; }
+.btn-edit { background:#334155; color:var(--primary); border:1px solid var(--primary); padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px; margin-right:5px; }
+.btn-delete { background:transparent; color:var(--red); border:1px solid var(--red); padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px; }
+.kategori-tab { display:flex; gap:6px; margin-bottom:15px; flex-wrap:wrap; }
+.kategori-tab button { flex:1; min-width:110px; padding:10px; border-radius:8px; border:1px solid #475569; background:#0F172A; color:#94A3B8; cursor:pointer; font-size:11px; font-weight:bold; }
+.kategori-tab button.active { background:var(--primary); color:#0F172A; border-color:var(--primary); }
+.field-group { display:none; }
+.field-group.show { display:block; }
+.subtable-title { font-size:13px; color:var(--primary); font-weight:bold; margin:20px 0 8px 2px; }
+</style>
 </head>
 <body>
 
-    <button id="main-btn-trigger" class="admin-trigger" onclick="aksesPanel()">🔒 LOGIN ADMIN</button>
+<button id="main-btn-trigger" class="admin-trigger" onclick="aksesPanel()">🔒 LOGIN ADMIN</button>
 
-    <div id="adminPanel" class="admin-panel">
-        <div class="panel-content">
-            <button style="float:right; color:var(--red); background:none; border:none; font-weight:bold; cursor:pointer;" onclick="toggleAdmin()">BATAL</button>
-            <h3 id="panel-title" style="color: var(--primary); margin-top: 0;">Input Transaksi</h3>
-            
-            <input type="hidden" id="edit-id"> 
-            
-            <label>Tanggal</label>
-            <input type="date" id="tgl">
-            <label>Keterangan Tambahan</label>
-            <input type="text" id="ket" placeholder="Misal: Jual karung & beli vitamin">
+<div id="adminPanel" class="admin-panel">
+  <div class="panel-content">
+    <button style="float:right; color:var(--red); background:none; border:none; font-weight:bold; cursor:pointer;" onclick="toggleAdmin()">BATAL</button>
+    <h3 id="panel-title" style="color:var(--primary); margin-top:0;">Input Transaksi</h3>
+    <input type="hidden" id="edit-id">
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-                <div style="grid-column: span 2; color: var(--red); font-size: 11px; border-bottom: 1px solid #334155;">📉 PENGELUARAN</div>
-                <div><label>Pakan (Rp)</label><input type="text" id="pakan" placeholder="0"></div>
-                <div><label>Gaji (Rp)</label><input type="text" id="gaji" placeholder="0"></div>
-                <div style="grid-column: span 2;"><label>Biaya Lain-lain (Rp)</label><input type="text" id="biaya_lain" placeholder="0"></div>
-
-                <div style="grid-column: span 2; color: var(--primary); font-size: 11px; border-bottom: 1px solid #334155; margin-top: 10px;">🥚 PRODUKSI TELUR</div>
-                <div><label>Super (Kg)</label><input type="number" step="0.01" id="kg_s" placeholder="0"></div>
-                <div><label>Harga Super /Kg</label><input type="text" id="hrg_s" placeholder="0"></div>
-                <div><label>Putih (Kg)</label><input type="number" step="0.01" id="kg_p" placeholder="0"></div>
-                <div><label>Harga Putih /Kg</label><input type="text" id="hrg_p" placeholder="0"></div>
-
-                <div style="grid-column: span 2; color: var(--green); font-size: 11px; border-bottom: 1px solid #334155; margin-top: 10px;">💰 PEMASUKAN LAIN</div>
-                <div style="grid-column: span 2;"><label>Nominal Pemasukan Lain (Rp)</label><input type="text" id="masuk_lain" placeholder="0"></div>
-            </div>
-
-            <button id="btn-save" class="btn-action" style="width: 100%; margin-top: 25px; padding: 15px;" onclick="simpanData()">SIMPAN DATA</button>
-        </div>
+    <label>Kategori Transaksi</label>
+    <div class="kategori-tab">
+      <button type="button" data-k="pakan_ovk" onclick="pilihKategori('pakan_ovk')">🌾 Pakan & OVK</button>
+      <button type="button" data-k="telur" onclick="pilihKategori('telur')">🥚 Telur</button>
+      <button type="button" data-k="pembayaran" onclick="pilihKategori('pembayaran')">💵 Kasbon/Bayar</button>
+      <button type="button" data-k="gaji_lain" onclick="pilihKategori('gaji_lain')">📋 Gaji/Lain</button>
     </div>
 
-    <div class="main-display">
-        <h1>Najwafarm 🐔</h1>
-        <p style="color: #94A3B8; margin-bottom: 20px; font-size: 14px;">Laporan Keuangan & Produksi</p>
+    <label>Tanggal</label>
+    <input type="date" id="tgl">
+    <label>No Dokumen / Nota (opsional)</label>
+    <input type="text" id="no_dok" placeholder="Misal: 260600001057">
 
-        <div class="section-title">Ringkasan Saldo <span id="periode-title">(Sesuai Filter)</span></div>
-        <div class="dashboard-grid">
-            <div class="stat-box full-width">
-                <h4>Saldo Keuntungan Bersih</h4>
-                <span id="saldo-global" class="val">Rp 0</span>
-            </div>
-            <div class="stat-box">
-                <h4>Total Pengeluaran</h4>
-                <span id="total-keluar-global" class="val txt-red">Rp 0</span>
-            </div>
-            <div class="stat-box">
-                <h4>Total Pemasukan</h4>
-                <span id="total-masuk-global" class="val txt-green">Rp 0</span>
-            </div>
+    <div id="fg-pakan_ovk" class="field-group">
+      <label>Nama Material</label>
+      <select id="pk_material">
+        <option value="FIN LA">FIN LA</option>
+        <option value="FIN LA LX">FIN LA LX</option>
+        <option value="Vitracycline">Vitracycline</option>
+        <option value="Introvit E Selenium">Introvit E Selenium</option>
+        <option value="Avimox 24">Avimox 24</option>
+        <option value="Levamid 100g">Levamid 100g</option>
+        <option value="Extra Guard Plus">Extra Guard Plus</option>
+        <option value="Fortevit 100g">Fortevit 100g</option>
+        <option value="__lainnya">✏️ Lainnya (ketik manual)</option>
+      </select>
+      <input type="text" id="pk_material_custom" placeholder="Nama material lain..." style="display:none; margin-top:8px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+        <div><label>Qty</label><input type="number" step="0.01" id="pk_qty" placeholder="0"></div>
+        <div><label>Satuan</label>
+          <select id="pk_satuan">
+            <option>Kg</option><option>Sachet</option><option>Liter</option><option>Pcs</option>
+          </select>
         </div>
-
-        <div class="section-title">Cek Produksi & Harga Telur</div>
-        <div class="search-box">
-            <label style="font-size: 11px; color: #94A3B8;">Pilih Tanggal Untuk Melihat Detail</label>
-            <div style="display: flex; gap: 10px; margin-top: 5px;">
-                <input type="date" id="search-date">
-                <button class="btn-action" onclick="cariData()">CEK DATA</button>
-            </div>
-            
-            <div id="search-result-area" style="display:none;">
-                <div class="search-result">
-                    <div class="res-item">
-                        <small>Harga Super</small>
-                        <b id="res-hrg-s" class="txt-green">Rp 0</b>
-                        <small style="margin-top:5px; display:block">Berat: <span id="res-kg-s">0</span> Kg</small>
-                    </div>
-                    <div class="res-item">
-                        <small>Harga Putih</small>
-                        <b id="res-hrg-p" class="txt-green">Rp 0</b>
-                        <small style="margin-top:5px; display:block">Berat: <span id="res-kg-p">0</span> Kg</small>
-                    </div>
-                    <div class="res-item" style="grid-column: span 2; text-align: center; background: var(--primary); color: #0F172A;">
-                        <small style="color: #0F172A; font-weight: bold;">Total Produksi Hari Ini</small>
-                        <b id="res-total-kg" style="font-size: 18px;">0 Kg</b>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-title">Tabel Laporan Berkala &amp; Filter Saldo</div>
-        <div class="filter-box">
-            <div class="filter-group">
-                <div><label>Dari</label><input type="date" id="f-mulai"></div>
-                <div><label>Sampai</label><input type="date" id="f-selesai"></div>
-                <button class="btn-action" onclick="muatData()">FILTER</button>
-            </div>
-            <div class="filter-quick">
-                <button class="btn-quick" onclick="setPeriodeHariIni()">Hari Ini</button>
-                <button class="btn-quick" onclick="setPeriodeBulanIni()">Bulan Ini</button>
-                <button class="btn-quick" onclick="setPeriodeBulanLalu()">Bulan Lalu</button>
-                <button class="btn-quick" onclick="setPeriodeTahunIni()">Tahun Ini</button>
-                <button class="btn-quick" onclick="setPeriodeSemua()">Semua Data</button>
-            </div>
-        </div>
-        <div class="period-label" id="periode-info"></div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tgl / Ket</th>
-                        <th>Biaya Total</th>
-                        <th>Omset & Laba</th>
-                        <th>Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="tabel-body"></tbody>
-            </table>
-        </div>
+      </div>
+      <label>Harga per Satuan (Rp)</label>
+      <input type="text" id="pk_harga" placeholder="0" class="uang">
     </div>
+
+    <div id="fg-telur" class="field-group">
+      <label>Jenis Telur</label>
+      <select id="tl_jenis"><option value="Super">Super</option><option value="Putih">Putih</option></select>
+      <label>Qty (Kg)</label>
+      <input type="number" step="0.01" id="tl_qty" placeholder="0">
+      <label>Harga per Kg (Rp)</label>
+      <input type="text" id="tl_harga" placeholder="0" class="uang">
+    </div>
+
+    <div id="fg-pembayaran" class="field-group">
+      <label>Jenis</label>
+      <select id="pb_jenis">
+        <option value="hutang">Kasbon (Nambah Hutang)</option>
+        <option value="piutang">Pembayaran (Ngurangi Hutang)</option>
+      </select>
+      <label>Nominal (Rp)</label>
+      <input type="text" id="pb_nominal" placeholder="0" class="uang">
+    </div>
+
+    <div id="fg-gaji_lain" class="field-group">
+      <label>Jenis</label>
+      <select id="gl_jenis">
+        <option value="gaji">Gaji</option>
+        <option value="biaya_lain">Biaya Lain-lain</option>
+        <option value="pemasukan_lain">Pemasukan Lain</option>
+      </select>
+      <label>Nominal (Rp)</label>
+      <input type="text" id="gl_nominal" placeholder="0" class="uang">
+    </div>
+
+    <label>Keterangan</label>
+    <input type="text" id="ket" placeholder="Catatan tambahan (opsional)">
+
+    <button id="btn-save" class="btn-action" style="width:100%; margin-top:20px; padding:15px;" onclick="simpanData()">SIMPAN DATA</button>
+  </div>
+</div>
+
+<div class="main-display">
+  <h1>Najwafarm 🐔</h1>
+  <p style="color:#94A3B8; margin-bottom:20px; font-size:14px;">Laporan Keuangan &amp; Produksi — Gaya Konfirmasi Kantor</p>
+
+  <div class="section-title">Konfirmasi Hutang/Piutang (Gaya CV Fian Putra)</div>
+  <div class="ledger-card">
+    <table>
+      <thead><tr><th>Saldo Awal</th><th>Pakan/OVK</th><th>Penjualan Telur</th><th>Kasbon</th><th>Pembayaran</th><th>Saldo Akhir</th></tr></thead>
+      <tbody><tr>
+        <td id="l-saldo-awal">Rp 0</td>
+        <td class="txt-red" id="l-pakan">Rp 0</td>
+        <td class="txt-green" id="l-telur">-Rp 0</td>
+        <td class="txt-red" id="l-kasbon">Rp 0</td>
+        <td class="txt-green" id="l-bayar">-Rp 0</td>
+        <td id="l-saldo-akhir">Rp 0</td>
+      </tr></tbody>
+    </table>
+  </div>
+  <p style="font-size:11px; color:#94A3B8; margin-top:0;">Saldo Akhir = Saldo Awal + Pakan/OVK − Penjualan Telur + Kasbon − Pembayaran. Ini saldo <b>hutang ke kantor</b>, bukan laba usaha.</p>
+
+  <div class="section-title">Ringkasan Laba Usaha (Periode Filter)</div>
+  <div class="dashboard-grid">
+    <div class="stat-box full-width">
+      <h4>Laba Bersih (Telur+Lain − Pakan−Gaji−Biaya Lain)</h4>
+      <span id="saldo-global" class="val">Rp 0</span>
+    </div>
+    <div class="stat-box"><h4>Total Pemasukan</h4><span id="total-masuk-global" class="val txt-green">Rp 0</span></div>
+    <div class="stat-box"><h4>Total Pengeluaran</h4><span id="total-keluar-global" class="val txt-red">Rp 0</span></div>
+  </div>
+
+  <div class="section-title">Filter Periode</div>
+  <div class="filter-box">
+    <div class="filter-group">
+      <div><label>Dari</label><input type="date" id="f-mulai"></div>
+      <div><label>Sampai</label><input type="date" id="f-selesai"></div>
+      <button class="btn-action" onclick="muatData()">FILTER</button>
+    </div>
+    <div class="filter-quick">
+      <button class="btn-quick" onclick="setPeriodeHariIni()">Hari Ini</button>
+      <button class="btn-quick" onclick="setPeriodeBulanIni()">Bulan Ini</button>
+      <button class="btn-quick" onclick="setPeriodeBulanLalu()">Bulan Lalu</button>
+      <button class="btn-quick" onclick="setPeriodeTahunIni()">Tahun Ini</button>
+      <button class="btn-quick" onclick="setPeriodeSemua()">Semua Data</button>
+    </div>
+  </div>
+  <div class="period-label" id="periode-info"></div>
+
+  <div class="subtable-title">🌾 Rincian Pengambilan Pakan &amp; OVK</div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead><tr><th>Tgl / No Dok</th><th>Material</th><th>Qty</th><th>Harga</th><th>Total</th><th>Opsi</th></tr></thead>
+      <tbody id="tbl-pakan"></tbody>
+    </table>
+  </div>
+
+  <div class="subtable-title">🥚 Rincian Penerimaan Telur</div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead><tr><th>Tgl / No Dok</th><th>Jenis</th><th>Qty (Kg)</th><th>Harga</th><th>Total</th><th>Opsi</th></tr></thead>
+      <tbody id="tbl-telur"></tbody>
+    </table>
+  </div>
+
+  <div class="subtable-title">💵 Rincian Kasbon &amp; Pembayaran</div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th><th>Opsi</th></tr></thead>
+      <tbody id="tbl-bayar"></tbody>
+    </table>
+  </div>
+
+  <div class="subtable-title">📋 Gaji &amp; Biaya Lain-lain</div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th><th>Opsi</th></tr></thead>
+      <tbody id="tbl-gaji"></tbody>
+    </table>
+  </div>
+</div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDbwSAS7uZ-TVZlSn97WP9sNU3JXYQeMvA",
-        authDomain: "najwafarm-dd1be.firebaseapp.com",
-        databaseURL: "https://najwafarm-dd1be-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "najwafarm-dd1be",
-        storageBucket: "najwafarm-dd1be.appspot.com",
-        messagingSenderId: "1033743274448",
-        appId: "1:1033743274448:web:6ad64eff21baaadc5369d5"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyDbwSAS7uZ-TVZlSn97WP9sNU3JXYQeMvA",
+  authDomain: "najwafarm-dd1be.firebaseapp.com",
+  databaseURL: "https://najwafarm-dd1be-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "najwafarm-dd1be",
+  storageBucket: "najwafarm-dd1be.appspot.com",
+  messagingSenderId: "1033743274448",
+  appId: "1:1033743274448:web:6ad64eff21baaadc5369d5"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+let is_admin = false;
+let globalSnapshot = null;
+let kategoriAktif = 'pakan_ovk';
 
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    let is_admin = false;
-    let globalDataSnapshot = null;
+const now = new Date();
+document.getElementById('f-mulai').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+document.getElementById('f-selesai').value = new Date(now.getFullYear(), now.getMonth()+1, 0).toISOString().split('T')[0];
+document.getElementById('tgl').valueAsDate = now;
 
-    // Inisialisasi Tanggal (default: bulan berjalan)
-    const now = new Date();
-    document.getElementById('f-mulai').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    document.getElementById('f-selesai').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-    document.getElementById('tgl').valueAsDate = now;
-    document.getElementById('search-date').valueAsDate = now;
+function formatRp(n){ return "Rp " + Math.abs(Number(n)||0).toLocaleString('id-ID'); }
+function bersihAngka(str){ if(typeof str==='number') return str; return parseFloat((str||"0").replace(/\./g,'')) || 0; }
+function toISO(d){ return d.toISOString().split('T')[0]; }
+function tglFmt(t){ return t.split('-').reverse().join('/'); }
 
-    function formatRp(n) { return "Rp " + Math.abs(Number(n)).toLocaleString('id-ID'); }
-    function bersihAngka(str) { 
-        if(typeof str === 'number') return str;
-        return parseFloat(str.replace(/\./g, '')) || 0; 
-    }
-    function toISO(d) { return d.toISOString().split('T')[0]; }
+function setPeriodeHariIni(){ const t=new Date(); document.getElementById('f-mulai').value=toISO(t); document.getElementById('f-selesai').value=toISO(t); muatData(); }
+function setPeriodeBulanIni(){ const t=new Date(); document.getElementById('f-mulai').value=toISO(new Date(t.getFullYear(),t.getMonth(),1)); document.getElementById('f-selesai').value=toISO(new Date(t.getFullYear(),t.getMonth()+1,0)); muatData(); }
+function setPeriodeBulanLalu(){ const t=new Date(); document.getElementById('f-mulai').value=toISO(new Date(t.getFullYear(),t.getMonth()-1,1)); document.getElementById('f-selesai').value=toISO(new Date(t.getFullYear(),t.getMonth(),0)); muatData(); }
+function setPeriodeTahunIni(){ const t=new Date(); document.getElementById('f-mulai').value=toISO(new Date(t.getFullYear(),0,1)); document.getElementById('f-selesai').value=toISO(new Date(t.getFullYear(),11,31)); muatData(); }
+function setPeriodeSemua(){ document.getElementById('f-mulai').value="2000-01-01"; document.getElementById('f-selesai').value="2099-12-31"; muatData(); }
 
-    // ==== TOMBOL PINTAS PERIODE ====
-    function setPeriodeHariIni() {
-        const t = new Date();
-        document.getElementById('f-mulai').value = toISO(t);
-        document.getElementById('f-selesai').value = toISO(t);
-        muatData();
-    }
-    function setPeriodeBulanIni() {
-        const t = new Date();
-        document.getElementById('f-mulai').value = toISO(new Date(t.getFullYear(), t.getMonth(), 1));
-        document.getElementById('f-selesai').value = toISO(new Date(t.getFullYear(), t.getMonth() + 1, 0));
-        muatData();
-    }
-    function setPeriodeBulanLalu() {
-        const t = new Date();
-        document.getElementById('f-mulai').value = toISO(new Date(t.getFullYear(), t.getMonth() - 1, 1));
-        document.getElementById('f-selesai').value = toISO(new Date(t.getFullYear(), t.getMonth(), 0));
-        muatData();
-    }
-    function setPeriodeTahunIni() {
-        const t = new Date();
-        document.getElementById('f-mulai').value = toISO(new Date(t.getFullYear(), 0, 1));
-        document.getElementById('f-selesai').value = toISO(new Date(t.getFullYear(), 11, 31));
-        muatData();
-    }
-    function setPeriodeSemua() {
-        document.getElementById('f-mulai').value = "2000-01-01";
-        document.getElementById('f-selesai').value = "2099-12-31";
-        muatData();
-    }
+document.querySelectorAll('.uang').forEach(el=>{
+  el.addEventListener('keyup', function(){ let v=this.value.replace(/[^0-9]/g,''); this.value = v ? Number(v).toLocaleString('id-ID') : ''; });
+});
+document.getElementById('pk_material').addEventListener('change', function(){
+  document.getElementById('pk_material_custom').style.display = this.value === '__lainnya' ? 'block' : 'none';
+});
 
-    // Input Auto Formatting Rupiah
-    const inputUang = ['pakan', 'gaji', 'biaya_lain', 'hrg_s', 'hrg_p', 'masuk_lain'];
-    inputUang.forEach(id => {
-        document.getElementById(id).addEventListener('keyup', function() {
-            let val = this.value.replace(/[^0-9]/g, '');
-            this.value = val ? Number(val).toLocaleString('id-ID') : '';
-        });
+function pilihKategori(k){
+  kategoriAktif = k;
+  document.querySelectorAll('.kategori-tab button').forEach(b=>b.classList.toggle('active', b.dataset.k===k));
+  document.querySelectorAll('.field-group').forEach(f=>f.classList.remove('show'));
+  document.getElementById('fg-'+k).classList.add('show');
+}
+
+function aksesPanel(){
+  if(is_admin){ resetForm(); toggleAdmin(); }
+  else{
+    if(prompt("Masukkan PIN Admin:") === "9999"){
+      is_admin = true;
+      document.getElementById('main-btn-trigger').textContent = "+ DATA BARU";
+      muatData(); toggleAdmin();
+    } else { alert("PIN Salah!"); }
+  }
+}
+function toggleAdmin(){ const p=document.getElementById('adminPanel'); p.style.display = p.style.display==='block' ? 'none' : 'block'; }
+
+function resetForm(){
+  document.getElementById('edit-id').value = "";
+  document.getElementById('panel-title').textContent = "Input Transaksi Baru";
+  document.getElementById('btn-save').textContent = "SIMPAN DATA";
+  document.getElementById('ket').value = "";
+  document.getElementById('no_dok').value = "";
+  document.getElementById('tgl').valueAsDate = new Date();
+  ['pk_qty','pk_harga','tl_qty','tl_harga','pb_nominal','gl_nominal'].forEach(id=>document.getElementById(id).value="");
+  document.getElementById('pk_material_custom').value = "";
+  document.getElementById('pk_material_custom').style.display = 'none';
+  document.getElementById('pk_material').value = "FIN LA";
+  pilihKategori('pakan_ovk');
+}
+
+function prepareEdit(id){
+  const data = globalSnapshot[id];
+  document.getElementById('edit-id').value = id;
+  document.getElementById('panel-title').textContent = "Edit Transaksi";
+  document.getElementById('btn-save').textContent = "UPDATE DATA";
+  document.getElementById('tgl').value = data.tgl;
+  document.getElementById('no_dok').value = data.no_dok || "";
+  document.getElementById('ket').value = data.ket || "";
+  pilihKategori(data.kategori);
+
+  if(data.kategori === 'pakan_ovk'){
+    const opsi = ['FIN LA','FIN LA LX','Vitracycline','Introvit E Selenium','Avimox 24','Levamid 100g','Extra Guard Plus','Fortevit 100g'];
+    if(opsi.includes(data.material)){ document.getElementById('pk_material').value = data.material; document.getElementById('pk_material_custom').style.display='none'; }
+    else { document.getElementById('pk_material').value = '__lainnya'; document.getElementById('pk_material_custom').style.display='block'; document.getElementById('pk_material_custom').value = data.material; }
+    document.getElementById('pk_qty').value = data.qty || 0;
+    document.getElementById('pk_satuan').value = data.satuan || 'Kg';
+    document.getElementById('pk_harga').value = (data.harga||0).toLocaleString('id-ID');
+  } else if(data.kategori === 'telur'){
+    document.getElementById('tl_jenis').value = data.material || 'Super';
+    document.getElementById('tl_qty').value = data.qty || 0;
+    document.getElementById('tl_harga').value = (data.harga||0).toLocaleString('id-ID');
+  } else if(data.kategori === 'pembayaran'){
+    document.getElementById('pb_jenis').value = data.jenis || 'hutang';
+    document.getElementById('pb_nominal').value = (data.total||0).toLocaleString('id-ID');
+  } else if(data.kategori === 'gaji_lain'){
+    document.getElementById('gl_jenis').value = data.jenis || 'gaji';
+    document.getElementById('gl_nominal').value = (data.total||0).toLocaleString('id-ID');
+  }
+  toggleAdmin();
+}
+
+function hapusData(id){
+  if(confirm("Hapus data ini secara permanen?")){
+    database.ref('transaksi/'+id).remove().then(()=>alert("Data dihapus!")).catch(e=>alert("Gagal: "+e.message));
+  }
+}
+
+function simpanData(){
+  const tgl = document.getElementById('tgl').value;
+  const id = document.getElementById('edit-id').value;
+  if(!tgl) return alert("Pilih tanggal!");
+
+  let payload = { tgl, kategori: kategoriAktif, no_dok: document.getElementById('no_dok').value || "", ket: document.getElementById('ket').value || "" };
+
+  if(kategoriAktif === 'pakan_ovk'){
+    let mat = document.getElementById('pk_material').value;
+    if(mat === '__lainnya') mat = document.getElementById('pk_material_custom').value || "Lainnya";
+    const qty = parseFloat(document.getElementById('pk_qty').value) || 0;
+    const harga = bersihAngka(document.getElementById('pk_harga').value);
+    payload = { ...payload, material: mat, satuan: document.getElementById('pk_satuan').value, qty, harga, total: qty*harga };
+  } else if(kategoriAktif === 'telur'){
+    const qty = parseFloat(document.getElementById('tl_qty').value) || 0;
+    const harga = bersihAngka(document.getElementById('tl_harga').value);
+    payload = { ...payload, material: document.getElementById('tl_jenis').value, qty, harga, total: qty*harga };
+  } else if(kategoriAktif === 'pembayaran'){
+    payload = { ...payload, jenis: document.getElementById('pb_jenis').value, total: bersihAngka(document.getElementById('pb_nominal').value) };
+  } else if(kategoriAktif === 'gaji_lain'){
+    payload = { ...payload, jenis: document.getElementById('gl_jenis').value, total: bersihAngka(document.getElementById('gl_nominal').value) };
+  }
+
+  const ref = id ? database.ref('transaksi/'+id) : database.ref('transaksi').push();
+  ref.set(payload).then(()=>{
+    alert(id ? "Data Diperbarui!" : "Data Tersimpan!");
+    toggleAdmin(); resetForm();
+  });
+}
+
+function muatData(){
+  const tglMulai = document.getElementById('f-mulai').value;
+  const tglSelesai = document.getElementById('f-selesai').value;
+  document.getElementById('periode-info').textContent = "Menampilkan periode: " + tglFmt(tglMulai) + " s/d " + tglFmt(tglSelesai);
+
+  database.ref('transaksi').on('value', (snapshot)=>{
+    globalSnapshot = snapshot.val() || {};
+    const entries = Object.entries(globalSnapshot).sort((a,b)=> a[1].tgl.localeCompare(b[1].tgl));
+
+    let saldoAwal = 0;
+    let pPakan=0, pTelur=0, pKasbon=0, pBayar=0, pGaji=0, pBiayaLain=0, pMasukLain=0;
+
+    const tbP=document.getElementById('tbl-pakan'), tbT=document.getElementById('tbl-telur'),
+          tbB=document.getElementById('tbl-bayar'), tbG=document.getElementById('tbl-gaji');
+    tbP.innerHTML=""; tbT.innerHTML=""; tbB.innerHTML=""; tbG.innerHTML="";
+
+    entries.forEach(([id,item])=>{
+      const inPeriode = item.tgl >= tglMulai && item.tgl <= tglSelesai;
+      const sebelumPeriode = item.tgl < tglMulai;
+
+      if(item.kategori === 'pakan_ovk'){
+        if(sebelumPeriode) saldoAwal += (item.total||0);
+        if(inPeriode){
+          pPakan += (item.total||0);
+          tbP.innerHTML += `<tr><td><b>${tglFmt(item.tgl)}</b><br><small>${item.no_dok||'-'}</small></td><td>${item.material}<br><small>${item.qty} ${item.satuan}</small></td><td>${formatRp(item.harga)}</td><td></td><td class="txt-red">${formatRp(item.total)}</td><td>${adminOpsi(id)}</td></tr>`;
+        }
+      } else if(item.kategori === 'telur'){
+        if(sebelumPeriode) saldoAwal -= (item.total||0);
+        if(inPeriode){
+          pTelur += (item.total||0);
+          tbT.innerHTML += `<tr><td><b>${tglFmt(item.tgl)}</b><br><small>${item.no_dok||'-'}</small></td><td>${item.material}</td><td>${item.qty}</td><td>${formatRp(item.harga)}</td><td class="txt-green">${formatRp(item.total)}</td><td>${adminOpsi(id)}</td></tr>`;
+        }
+      } else if(item.kategori === 'pembayaran'){
+        const isKasbon = item.jenis === 'hutang';
+        if(sebelumPeriode) saldoAwal += isKasbon ? (item.total||0) : -(item.total||0);
+        if(inPeriode){
+          if(isKasbon) pKasbon += (item.total||0); else pBayar += (item.total||0);
+          tbB.innerHTML += `<tr><td>${tglFmt(item.tgl)}</td><td class="${isKasbon?'txt-red':'txt-green'}">${isKasbon?'Kasbon':'Pembayaran'}</td><td>${item.ket||'-'}</td><td class="${isKasbon?'txt-red':'txt-green'}">${formatRp(item.total)}</td><td>${adminOpsi(id)}</td></tr>`;
+        }
+      } else if(item.kategori === 'gaji_lain'){
+        if(inPeriode){
+          if(item.jenis === 'gaji') pGaji += (item.total||0);
+          else if(item.jenis === 'biaya_lain') pBiayaLain += (item.total||0);
+          else pMasukLain += (item.total||0);
+          const label = item.jenis==='gaji'?'Gaji':(item.jenis==='biaya_lain'?'Biaya Lain':'Pemasukan Lain');
+          const warna = item.jenis==='pemasukan_lain' ? 'txt-green' : 'txt-red';
+          tbG.innerHTML += `<tr><td>${tglFmt(item.tgl)}</td><td>${label}</td><td>${item.ket||'-'}</td><td class="${warna}">${formatRp(item.total)}</td><td>${adminOpsi(id)}</td></tr>`;
+        }
+      }
     });
 
-    function aksesPanel() {
-        if (is_admin) { 
-            resetForm(); 
-            toggleAdmin(); 
-        } else {
-            if (prompt("Masukkan PIN Admin:") === "9999") { 
-                is_admin = true; 
-                document.getElementById('main-btn-trigger').textContent = "+ DATA BARU";
-                muatData(); 
-                toggleAdmin(); 
-            } else {
-                alert("PIN Salah!");
-            }
-        }
-    }
+    if(tbP.innerHTML==="") tbP.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94A3B8;">Tidak ada data</td></tr>';
+    if(tbT.innerHTML==="") tbT.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94A3B8;">Tidak ada data</td></tr>';
+    if(tbB.innerHTML==="") tbB.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94A3B8;">Tidak ada data</td></tr>';
+    if(tbG.innerHTML==="") tbG.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94A3B8;">Tidak ada data</td></tr>';
 
-    function toggleAdmin() {
-        const p = document.getElementById('adminPanel');
-        p.style.display = p.style.display === 'block' ? 'none' : 'block';
-    }
+    const saldoAkhir = saldoAwal + pPakan - pTelur + pKasbon - pBayar;
+    document.getElementById('l-saldo-awal').textContent = formatRp(saldoAwal);
+    document.getElementById('l-pakan').textContent = formatRp(pPakan);
+    document.getElementById('l-telur').textContent = "-" + formatRp(pTelur);
+    document.getElementById('l-kasbon').textContent = formatRp(pKasbon);
+    document.getElementById('l-bayar').textContent = "-" + formatRp(pBayar);
+    document.getElementById('l-saldo-akhir').textContent = formatRp(saldoAkhir);
 
-    function resetForm() {
-        document.getElementById('edit-id').value = "";
-        document.getElementById('panel-title').textContent = "Input Transaksi Baru";
-        document.getElementById('btn-save').textContent = "SIMPAN DATA";
-        document.getElementById('ket').value = "";
-        inputUang.forEach(id => document.getElementById(id).value = "");
-        document.getElementById('kg_s').value = "";
-        document.getElementById('kg_p').value = "";
-        document.getElementById('tgl').valueAsDate = new Date();
-    }
+    const totalMasuk = pTelur + pMasukLain;
+    const totalKeluar = pPakan + pGaji + pBiayaLain;
+    const laba = totalMasuk - totalKeluar;
+    document.getElementById('saldo-global').textContent = formatRp(laba);
+    document.getElementById('saldo-global').className = 'val ' + (laba>=0 ? 'txt-green':'txt-red');
+    document.getElementById('total-masuk-global').textContent = formatRp(totalMasuk);
+    document.getElementById('total-keluar-global').textContent = formatRp(totalKeluar);
+  });
+}
 
-    function prepareEdit(id) {
-        const data = globalDataSnapshot[id];
-        document.getElementById('edit-id').value = id;
-        document.getElementById('panel-title').textContent = "Edit Data Transaksi";
-        document.getElementById('btn-save').textContent = "UPDATE DATA";
-        
-        document.getElementById('tgl').value = data.tgl;
-        document.getElementById('ket').value = data.ket || "";
-        document.getElementById('pakan').value = (data.pakan || 0).toLocaleString('id-ID');
-        document.getElementById('gaji').value = (data.gaji || 0).toLocaleString('id-ID');
-        document.getElementById('biaya_lain').value = (data.biaya_lain || 0).toLocaleString('id-ID');
-        document.getElementById('kg_s').value = data.kg_s || 0;
-        document.getElementById('hrg_s').value = (data.hrg_s || 0).toLocaleString('id-ID');
-        document.getElementById('kg_p').value = data.kg_p || 0;
-        document.getElementById('hrg_p').value = (data.hrg_p || 0).toLocaleString('id-ID');
-        document.getElementById('masuk_lain').value = (data.masuk_lain || 0).toLocaleString('id-ID');
-        
-        toggleAdmin();
-    }
+function adminOpsi(id){
+  return is_admin ? `<div style="display:flex; flex-direction:column; gap:5px;"><button class="btn-edit" onclick="prepareEdit('${id}')">✏️</button><button class="btn-delete" onclick="hapusData('${id}')">🗑️</button></div>` : '🔒';
+}
 
-    function hapusData(id) {
-        if (confirm("Hapus data ini secara permanen?")) {
-            database.ref('ternak_laporan/' + id).remove()
-                .then(() => alert("Data berhasil dihapus!"))
-                .catch(e => alert("Gagal: " + e.message));
-        }
-    }
-
-    function simpanData() {
-        const tgl = document.getElementById('tgl').value;
-        const id = document.getElementById('edit-id').value;
-        if(!tgl) return alert("Pilih tanggal!");
-
-        const payload = {
-            tgl: tgl,
-            ket: document.getElementById('ket').value || "Tanpa Keterangan",
-            pakan: bersihAngka(document.getElementById('pakan').value),
-            gaji: bersihAngka(document.getElementById('gaji').value),
-            biaya_lain: bersihAngka(document.getElementById('biaya_lain').value),
-            kg_s: parseFloat(document.getElementById('kg_s').value) || 0,
-            hrg_s: bersihAngka(document.getElementById('hrg_s').value),
-            kg_p: parseFloat(document.getElementById('kg_p').value) || 0,
-            hrg_p: bersihAngka(document.getElementById('hrg_p').value),
-            masuk_lain: bersihAngka(document.getElementById('masuk_lain').value)
-        };
-
-        const ref = id ? database.ref('ternak_laporan/' + id) : database.ref('ternak_laporan').push();
-        ref.set(payload).then(() => {
-            alert(id ? "Data Diperbarui!" : "Data Tersimpan!");
-            toggleAdmin(); 
-            resetForm();
-        });
-    }
-
-    function cariData() {
-        const targetDate = document.getElementById('search-date').value;
-        if(!globalDataSnapshot) return;
-        let kgS = 0, kgP = 0, hrgS = 0, hrgP = 0, found = false;
-        Object.values(globalDataSnapshot).forEach(item => {
-            if(item.tgl === targetDate) {
-                kgS += (item.kg_s || 0); kgP += (item.kg_p || 0);
-                if(item.hrg_s > 0) hrgS = item.hrg_s;
-                if(item.hrg_p > 0) hrgP = item.hrg_p;
-                found = true;
-            }
-        });
-        document.getElementById('search-result-area').style.display = 'block';
-        document.getElementById('res-hrg-s').textContent = formatRp(hrgS);
-        document.getElementById('res-hrg-p').textContent = formatRp(hrgP);
-        document.getElementById('res-kg-s').textContent = kgS.toFixed(2);
-        document.getElementById('res-kg-p').textContent = kgP.toFixed(2);
-        document.getElementById('res-total-kg').textContent = (kgS + kgP).toFixed(2) + " Kg";
-        if(!found) alert("Tidak ada data pada tanggal tersebut.");
-    }
-
-    // ==== MUAT DATA: saldo & ringkasan sekarang MENGIKUTI rentang filter, bukan total semua data ====
-    function muatData() {
-        const tglMulai = document.getElementById('f-mulai').value;
-        const tglSelesai = document.getElementById('f-selesai').value;
-
-        document.getElementById('periode-info').textContent =
-            "Menampilkan periode: " + tglMulai.split('-').reverse().join('/') + " s/d " + tglSelesai.split('-').reverse().join('/');
-
-        database.ref('ternak_laporan').on('value', (snapshot) => {
-            globalDataSnapshot = snapshot.val();
-            const tbody = document.getElementById('tabel-body');
-            tbody.innerHTML = "";
-            let sGlobal = 0, tMasukGlobal = 0, tKeluarGlobal = 0;
-
-            if (globalDataSnapshot) {
-                const sorted = Object.entries(globalDataSnapshot).sort((a, b) => b[1].tgl.localeCompare(a[1].tgl));
-                sorted.forEach(([id, item]) => {
-                    const biaya = (item.pakan || 0) + (item.gaji || 0) + (item.biaya_lain || 0);
-                    const omset = ((item.kg_s || 0) * (item.hrg_s || 0)) + ((item.kg_p || 0) * (item.hrg_p || 0)) + (item.masuk_lain || 0);
-                    const laba = omset - biaya;
-
-                    // Hanya masuk hitungan ringkasan & tabel kalau tanggalnya ada di rentang filter
-                    if (item.tgl >= tglMulai && item.tgl <= tglSelesai) {
-                        sGlobal += laba;
-                        tMasukGlobal += omset;
-                        tKeluarGlobal += biaya;
-
-                        tbody.innerHTML += `
-                            <tr>
-                                <td><b>${item.tgl.split('-').reverse().join('/')}</b><br><small>${item.ket}</small></td>
-                                <td><span class="txt-red">${formatRp(biaya)}</span></td>
-                                <td>
-                                    <span class="txt-green">${formatRp(omset)}</span><br>
-                                    <small style="color:${laba >= 0 ? 'var(--green)' : 'var(--red)'}">Laba: ${formatRp(laba)}</small>
-                                </td>
-                                <td>
-                                    ${is_admin ? `
-                                        <div style="display:flex; flex-direction:column; gap:5px;">
-                                            <button class="btn-edit" onclick="prepareEdit('${id}')">✏️ EDIT</button>
-                                            <button class="btn-delete" onclick="hapusData('${id}')">🗑️ HAPUS</button>
-                                        </div>
-                                    ` : '🔒'}
-                                </td>
-                            </tr>
-                        `;
-                    }
-                });
-            }
-            document.getElementById('saldo-global').textContent = formatRp(sGlobal);
-            document.getElementById('saldo-global').className = 'val ' + (sGlobal >= 0 ? 'txt-green' : 'txt-red');
-            document.getElementById('total-keluar-global').textContent = formatRp(tKeluarGlobal);
-            document.getElementById('total-masuk-global').textContent = formatRp(tMasukGlobal);
-        });
-    }
-
-    muatData();
+pilihKategori('pakan_ovk');
+muatData();
 </script>
 </body>
 </html>
