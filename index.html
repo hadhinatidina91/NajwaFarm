@@ -378,7 +378,7 @@ function muatData(){
         if(sebelumPeriode) saldoAwal += (item.total||0);
         if(inPeriode){
           pPakan += (item.total||0);
-          tbP.innerHTML += `<tr><td><b>${tglFmt(item.tgl)}</b><br><small>${item.no_dok||'-'}</small></td><td>${item.material}<br><small>${item.qty} ${item.satuan}</small></td><td>${formatRp(item.harga)}</td><td></td><td class="txt-red">${formatRp(item.total)}</td><td>${adminOpsi(id)}</td></tr>`;
+          tbP.innerHTML += `<tr><td><b>${tglFmt(item.tgl)}</b><br><small>${item.no_dok||'-'}</small></td><td>${item.material}</td><td>${item.qty} ${item.satuan}</td><td>${formatRp(item.harga)}</td><td class="txt-red">${formatRp(item.total)}</td><td>${adminOpsi(id)}</td></tr>`;
         }
       } else if(item.kategori === 'telur'){
         if(sebelumPeriode) saldoAwal -= (item.total||0);
